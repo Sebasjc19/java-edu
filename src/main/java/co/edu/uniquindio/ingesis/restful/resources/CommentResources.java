@@ -1,12 +1,8 @@
 package co.edu.uniquindio.ingesis.restful.resources;
 
-import co.edu.uniquindio.ingesis.restful.domain.Comment;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentResponse;
-import co.edu.uniquindio.ingesis.restful.dtos.comments.ObtainCommentsResponse;
-import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ObtainUsersResponse;
-import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
-import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserResponse;
+import co.edu.uniquindio.ingesis.restful.dtos.comments.UpdateCommentRequest;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.CommentService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -14,8 +10,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("/comments")
@@ -44,16 +38,16 @@ public class CommentResources {
 
     // 3. Crear un nuevo comentario
     @POST
-    public Response createComment(Comment comment) {
-        CommentResponse commentResponse = commentService.createComment();
+    public Response createComment(@Valid CommentCreationRequest request) {
+        CommentResponse commentResponse = commentService.createComment(request);
         return Response.ok(commentResponse).build();
     }
 
     // 4. Actualizar completamente un comentario
     @PUT
     @Path("/{id}")
-    public Response updateCommentById(@PathParam("id") Long id, @Valid CommentCreationRequest comment) {
-        CommentResponse commentResponse = commentService.updateCommentById(id, comment);
+    public Response updateCommentById(@PathParam("id") Long id, @Valid UpdateCommentRequest request) {
+        CommentResponse commentResponse = commentService.updateCommentById(id, request);
         return Response.ok(commentResponse).build();
     }
 
@@ -70,8 +64,8 @@ public class CommentResources {
     @Path("/")
     public Response findCommentsByProfessorId(Long professorId) {
         //TODO: pendiente de organizar la ruta
-        CommentResponse commentResponse = commentService.findCommentsByProfessorId(professorId);
-        return Response.ok(commentResponse).build();
+        List<CommentResponse> commentResponseList = commentService.findCommentsByProfessorId(professorId);
+        return Response.ok(commentResponseList).build();
     }
 
 
