@@ -61,12 +61,10 @@ public class CommentResources {
 
     // 7. Método personalizado: Obtener comentarios realizados segun el profesor
     @GET
-    @Path("/")
-    public Response findCommentsByProfessorId(Long professorId) {
+    @Path("/{professorId}")
+    public Response findCommentsByProfessorId(@PathParam("professorId") Long professorId) {
         //TODO: pendiente de organizar la ruta
         List<CommentResponse> commentResponseList = commentService.findCommentsByProfessorId(professorId);
         return Response.ok(commentResponseList).build();
     }
-
-
 }
