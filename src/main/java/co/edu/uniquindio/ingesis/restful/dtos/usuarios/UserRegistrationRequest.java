@@ -10,7 +10,7 @@ import java.util.Objects;
 public record UserRegistrationRequest(
         @NotBlank(message = "El campo es requerido")
         @Size(max = 100,message = "No debe exceder los 100 caracteres")
-        String name,
+        String username,
 
         @NotBlank(message = "El campo es requerido")
         @Email(message = "Debe ser un email válido")
@@ -29,8 +29,6 @@ public record UserRegistrationRequest(
         @PastOrPresent(message = "La fecha no puede ser futura")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate birthDate,
-
-        LocalDate registrationDate,
 
         Long idGroup,
 
