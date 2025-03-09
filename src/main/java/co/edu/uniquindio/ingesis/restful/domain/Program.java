@@ -25,6 +25,7 @@ public class Program extends PanacheEntity {
     private String code;
     private LocalDate creationDate;
     private LocalDate modificationDate;
+    @NotNull
     private Type type;
     @NotNull
     private Long userId;

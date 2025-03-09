@@ -1,21 +1,17 @@
 package co.edu.uniquindio.ingesis.restful.services.implementations;
 
-import co.edu.uniquindio.ingesis.restful.domain.Comment;
 import co.edu.uniquindio.ingesis.restful.domain.Group;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.UpdateGroupRequest;
 import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
-import co.edu.uniquindio.ingesis.restful.mappers.CommentMapper;
 import co.edu.uniquindio.ingesis.restful.mappers.GroupMapper;
-import co.edu.uniquindio.ingesis.restful.repositories.interfaces.CommentRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.GroupRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.GroupService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

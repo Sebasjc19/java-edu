@@ -3,17 +3,13 @@ package co.edu.uniquindio.ingesis.restful.dtos.programs;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
-
-public record ProgramUpdateRequest(
+public record UpdateProgramRequest(
         @NotNull
-        Long programId,
-        @NotNull
-        @NotBlank
+        @NotBlank(message = "El título del programa no puede estar vacío")
         String title,
-        @NotBlank
+        @NotBlank(message = "Debe proporcionar una descripción")
         String description,
-        @NotBlank
+        @NotBlank(message = "El código no puede estar vacío")
         String code,
         @NotNull
         Long userId

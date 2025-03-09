@@ -1,32 +1,71 @@
 package co.edu.uniquindio.ingesis.restful.resources;
 
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramCreationRequest;
-import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramUpdateRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramResponse;
+import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
+import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Path("/programs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
 public class ProgramResources {
 
-    @POST
-    public Response createProgram(@Valid ProgramCreationRequest programCreationRequest){
-        //Verificar que tipo de usuario creo el programa
-        //Asiganar fecha de creacion
-        //Asiganar fecha de modificacion
-        //Asiganar tipo
-        return Response.ok("Programa creado con exito").build();
+    ProgramService programService;
+
+    /**
+     * Obtener todos los programas asociados a un usuario.
+     */
+    @GET
+    @Path("/{userId}")
+    public Response findProgramsByUserId(@PathParam("userId") Long userId) {
+        List<ProgramResponse> programResponses = programService.findProgramsByUserId(userId);
+        return Response.ok(programResponses).build();
     }
 
+    /**
+     * Obtener un programa por su ID.
+     */
+    @GET
+    @Path("/{id}")
+    public Response getProgramById(@PathParam("id") Long id) {
+        ProgramResponse programResponse = programService.getProgramById(id);
+        return Response.ok(programResponse).build();
+    }
+
+    /**
+     * Crear un programa por primera vez
+     */
+    @POST
+    public Response createProgram(@Valid ProgramCreationRequest request){
+        ProgramResponse programResponse = programService.createProgram(request);
+        return Response.status(Response.Status.CREATED).entity(programResponse).build();
+    }
+
+    /**
+     * Actualizar un programa
+     */
     @PUT
     @Path("/{id}")
-    public Response updateProgramById(ProgramUpdateRequest programUpdateRequest){
-        //buscar programa por id
-        //Actualizar los datos del programa
-        //cambiar fecha de modificacion
-        return Response.ok("Programa actualizado").build();
+    public Response updateProgramById(Long id, UpdateProgramRequest request){
+        ProgramResponse programResponse = programService.updateProgramById(id, request);
+        return Response.ok(programResponse).build();
+    }
+
+    /**
+     * Eliminar un programa por ID.
+     */
+    @DELETE
+    @Path("/{id}")
+    public Response deleteProgram(@PathParam("id") Long id) {
+        ProgramResponse programResponse = programService.deleteProgram(id);
+        return Response.ok(programResponse).build();
     }
 }
