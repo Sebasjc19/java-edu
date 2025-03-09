@@ -10,6 +10,7 @@ import co.edu.uniquindio.ingesis.restful.repositories.interfaces.GroupRepository
 import co.edu.uniquindio.ingesis.restful.services.interfaces.GroupService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -46,6 +47,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public GroupResponse createGroup(GroupCreationRequest request) {
         Group group = groupMapper.parseOf(request);
         group.persist();
@@ -54,6 +56,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public GroupResponse updateGroupById(Long id, UpdateGroupRequest request) {
 
         // Validar si el grupo se encuentra en la base de datos
@@ -72,6 +75,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public GroupResponse deleteGroup(Long id) {
         // Validar si el grupo se encuentra en la base de datos
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(id);

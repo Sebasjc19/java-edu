@@ -52,6 +52,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public CommentResponse updateCommentById(Long id, UpdateCommentRequest request) {
 
         // Validar si el comentario se encuentra en la base de datos

@@ -11,6 +11,7 @@ import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ProgramReposito
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
@@ -47,6 +48,7 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
+    @Transactional
     public ProgramResponse createProgram(ProgramCreationRequest request) {
 
         Program program = programMapper.parseOf(request);
@@ -57,6 +59,7 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
+    @Transactional
     public ProgramResponse updateProgramById(Long id, UpdateProgramRequest request) {
 
         // Validar si el programa se encuentra en la base de datos
@@ -83,6 +86,7 @@ public class ProgramServiceImpl implements ProgramService {
     }
 
     @Override
+    @Transactional
     public ProgramResponse deleteProgram(Long id) {
         // Validar si el programa se encuentra en la base de datos
         Optional<Program> optionalProgram = programRepository.findByIdOptional(id);
