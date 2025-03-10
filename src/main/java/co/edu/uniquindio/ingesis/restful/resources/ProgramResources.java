@@ -54,7 +54,7 @@ public class ProgramResources {
      */
     @PUT
     @Path("/{id}")
-    public Response updateProgramById(Long id, UpdateProgramRequest request){
+    public Response updateProgramById(@PathParam("id") Long id, @Valid UpdateProgramRequest request){
         ProgramResponse programResponse = programService.updateProgramById(id, request);
         return Response.ok(programResponse).build();
     }
