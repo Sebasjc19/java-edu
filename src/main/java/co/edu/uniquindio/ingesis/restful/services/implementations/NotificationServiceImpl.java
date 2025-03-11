@@ -22,7 +22,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Inject
     NotificationMapper notificationMapper;
-    final NotificationRepository notificationRepository;
+    NotificationRepository notificationRepository;
 
 
     @Override

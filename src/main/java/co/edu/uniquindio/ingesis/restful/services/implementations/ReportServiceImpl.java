@@ -22,7 +22,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Inject
     ReportMapper reportMapper;
-    final ReportRepository reportRepository;
+    ReportRepository reportRepository;
 
 
     @Override

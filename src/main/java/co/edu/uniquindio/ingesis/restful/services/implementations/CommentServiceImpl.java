@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
     @Inject
     CommentMapper commentMapper;
-    final CommentRepository commentRepository;
+    CommentRepository commentRepository;
 
     @Override
     public CommentResponse getAllComments() {

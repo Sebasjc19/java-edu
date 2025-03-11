@@ -23,7 +23,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Inject
     GroupMapper groupMapper;
-    final GroupRepository groupRepository;
+    GroupRepository groupRepository;
 
     @Override
     public List<GroupResponse> findGroupsByProfessorId(Long professorId) {
