@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@Path("/comments")
+@Path("/groups")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor

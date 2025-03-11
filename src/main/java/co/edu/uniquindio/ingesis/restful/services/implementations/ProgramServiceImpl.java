@@ -25,7 +25,7 @@ public class ProgramServiceImpl implements ProgramService {
 
     @Inject
     ProgramMapper programMapper;
-    final ProgramRepository programRepository;
+    ProgramRepository programRepository;
 
     @Override
     public List<ProgramResponse> findProgramsByUserId(Long userId) {
