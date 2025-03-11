@@ -11,15 +11,13 @@ public record UserUpdateRequest(
          */
         @NotBlank(message = "El campo es requerido")
         @Size(max = 100,message = "No debe exceder los 100 caracteres")
-        Optional<String> fullName,
+        Optional<String> username,
         @NotBlank(message = "El campo es requerido")
         @Email(message = "Debe ser un email válido")
         Optional<String> email,
         @NotBlank(message = "El campo es requerido")
         @Pattern(regexp = "^(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z]).*$",message = "Debe contener a")
         @Size(min = 8,message = "La longitud mínima es 8")
-        Optional<String> password,
-        @NotBlank(message = "El campo es requerido")
-        Optional<LocalDate> datebirth
+        Optional<String> password
 ) {
 }
