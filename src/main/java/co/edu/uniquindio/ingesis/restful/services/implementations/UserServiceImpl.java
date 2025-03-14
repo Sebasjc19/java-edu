@@ -1,8 +1,8 @@
 package co.edu.uniquindio.ingesis.restful.services.implementations;
 
-import co.edu.uniquindio.ingesis.restful.domain.Program;
 import co.edu.uniquindio.ingesis.restful.domain.Status;
 import co.edu.uniquindio.ingesis.restful.domain.User;
+import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ShowUserRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserUpdateRequest;
@@ -15,7 +15,6 @@ import co.edu.uniquindio.ingesis.restful.services.interfaces.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
@@ -32,7 +31,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse createUser(UserRegistrationRequest request) {
         User user = userMapper.parseOf(request);
-        Optional<User> optionalUser = userRepository.finByEmail(request.email());
+        Optional<User> optionalUser = userRepository.findByEmail(request.email());
         if(optionalUser.isPresent()){
             new EmailAlredyExistsExceptionMapper();
         }
@@ -119,5 +118,10 @@ public class UserServiceImpl implements UserService {
         user.persist();
 
         return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public UserResponse showUser(Long id, ShowUserRequest showUserRequest) {
+        return null;
     }
 }
