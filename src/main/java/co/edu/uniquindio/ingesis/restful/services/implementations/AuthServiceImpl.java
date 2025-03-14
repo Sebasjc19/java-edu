@@ -5,6 +5,7 @@ import co.edu.uniquindio.ingesis.restful.domain.User;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.SesionAdminRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.SesionUserRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.TokenResponse;
+import co.edu.uniquindio.ingesis.restful.mappers.UserMapper;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.AuthService;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.security.jwt.JwtGenerator;
@@ -18,59 +19,40 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     @Inject
+    UserMapper userMapper;
     UserRepository userRepository;
     @Override
     public TokenResponse loginUser(SesionUserRequest sesionUserRequest) {
-        if (sesionUserRequest.email() == null || sesionUserRequest.email().isEmpty() ||
-                sesionUserRequest.password() == null || sesionUserRequest.password().isEmpty()) {
-            throw new IllegalArgumentException("El email y la contraseña no pueden estar vacíos.");
-        }
-
-        Optional<User> usuarioOptional = userRepository.findByEmail(sesionUserRequest.email());
-
-        if (usuarioOptional.isEmpty()) {
-            throw new IllegalArgumentException("El correo no se encuentra registrado.");
-        }
-
-        User user = usuarioOptional.get();
-        if (!BcryptUtil.matches(sesionUserRequest.password(), user.getPassword())) {
-            throw new IllegalArgumentException("La contraseña es incorrecta.");
-        }
-
-        // Usar el rol real
-        if (user.getRole()== null || user.getRole().equals(Role.ADMIN)) {
-            throw new IllegalArgumentException("El usuario no tiene un rol asignado.");
-        }
-        String token = JwtGenerator.generateToken(user.getEmail(), user.getBirthDate().toString(), user.getRole().toString(), user.getIdentificationNumber());
-
-        return new TokenResponse(token);
+        return userRepository.findByEmail(sesionUserRequest.email())
+                .filter(user -> BcryptUtil.matches(sesionUserRequest.password(), user.getPassword()))
+                .filter(user -> user.getRole() != null && !user.getRole().equals(Role.ADMIN))
+                .map(user -> {
+                    String token = JwtGenerator.generateToken(
+                            user.getEmail(),
+                            user.getBirthDate().toString(),
+                            user.getRole().toString(),
+                            user.getIdentificationNumber()
+                    );
+                    return new TokenResponse(token);
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas o usuario sin rol válido."));
     }
-
 
     @Override
     public TokenResponse loginAdmin(SesionAdminRequest sesionAdminRequest) throws Exception {
-        if (sesionAdminRequest.email() == null || sesionAdminRequest.email().isEmpty() ||
-                sesionAdminRequest.password() == null || sesionAdminRequest.password().isEmpty()) {
-            throw new IllegalArgumentException("El email y la contraseña no pueden estar vacíos.");
-        }
-
-        Optional<User> usuarioOptional = userRepository.findByEmail(sesionAdminRequest.email());
-
-        if (usuarioOptional.isEmpty()) {
-            throw new IllegalArgumentException("El correo no se encuentra registrado.");
-        }
-
-        User user = usuarioOptional.get();
-        if (!BcryptUtil.matches(sesionAdminRequest.password(), user.getPassword())) {
-            throw new IllegalArgumentException("La contraseña es incorrecta.");
-        }
-
-        // Usar el rol real
-        if (user.getRole()== null || user.getRole().equals(Role.USER)) {
-            throw new IllegalArgumentException("El usuario no tiene un rol asignado.");
-        }
-        String token = JwtGenerator.generateToken(user.getEmail(), user.getBirthDate().toString(), user.getRole().toString(), user.getIdentificationNumber());
-
-        return new TokenResponse(token);
+        return userRepository.findByEmail(sesionAdminRequest.email())
+                .filter(user -> BcryptUtil.matches(sesionAdminRequest.password(), user.getPassword()))
+                .filter(user -> user.getRole() != null && !user.getRole().equals(Role.USER))
+                .map(user -> {
+                    String token = JwtGenerator.generateToken(
+                            user.getEmail(),
+                            user.getBirthDate().toString(),
+                            user.getRole().toString(),
+                            user.getIdentificationNumber()
+                    );
+                    return new TokenResponse(token);
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas o usuario sin rol válido."));
     }
+
 }
