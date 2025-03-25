@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     @Inject  UserMapper userMapper;
+    @Inject
     UserRepository userRepository;
 
     @Transactional
