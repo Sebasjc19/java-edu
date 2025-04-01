@@ -3,6 +3,7 @@ package co.edu.uniquindio.ingesis.restful.resources;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
+import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -10,6 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.List;
 
 @Path("/programs")
@@ -64,8 +66,18 @@ public class ProgramResources {
      */
     @DELETE
     @Path("/{id}")
-    public Response deleteProgram(@PathParam("id") Long id) {
+    public Response deleteProgram(@PathParam("id") Long id) throws ResourceNotFoundException {
         ProgramResponse programResponse = programService.deleteProgram(id);
         return Response.ok(programResponse).build();
+    }
+    @GET
+    @Path("/execute/{id}")
+    public Response ejecutarPrograma(@PathParam("id") Long id) {
+        try {
+            String resultado = programService.executeProgram(id);
+            return Response.ok(resultado).build();
+        } catch (IOException | InterruptedException | ResourceNotFoundException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al ejecutar: " + e.getMessage()).build();
+        }
     }
 }

@@ -5,6 +5,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserUpdateRequest;
 import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.EmailAlredyExistsExceptionMapper;
+import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.UserService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -38,7 +39,7 @@ public class UserResources {
 
     @GET
     @Path("/{id}")
-    public Response findById(@PathParam("id") Long id) {
+    public Response findById(@PathParam("id") Long id) throws ResourceNotFoundException {
         UserResponse userResponse = userService.findById(id);
         return Response.ok(userResponse).build();
     }
