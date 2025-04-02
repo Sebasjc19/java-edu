@@ -43,10 +43,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse findById(Long id) {
+    public UserResponse findById(Long id) throws ResourceNotFoundException {
         User user = User.findById(id);
         if( user == null ){
-            new ResourceNotFoundException();
+            throw new ResourceNotFoundException();
         }
         return userMapper.toUserResponse(user);
     }
