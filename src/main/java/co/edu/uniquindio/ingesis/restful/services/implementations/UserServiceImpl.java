@@ -23,12 +23,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @ApplicationScoped
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     @Inject  UserMapper userMapper;
     @Inject
     UserRepository userRepository;
+
+    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger("AUDIT");
 
     @Transactional
     public UserResponse createUser(UserRegistrationRequest request) {
@@ -44,8 +50,10 @@ public class UserServiceImpl implements UserService {
             new UsernameAlredyExistsExceptionMapper();
         }
         user.setRegistrationDate(LocalDate.now());
+        user.setStatus(Status.ACTIVE);
         user.persist();
 
+        AUDIT_LOGGER.info("User created: {}", request.email());
         return userMapper.toUserResponse(user);
     }
 

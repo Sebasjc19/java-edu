@@ -22,7 +22,7 @@ public class TokenUtils {
 
     public static String generateTokenString(JwtClaims claims) throws Exception{
         PrivateKey pk = readPrivateKey("/privateKey.pem");
-        return generateTokenString(pk,"/privateKey.pem", claims);
+        return generateTokenString(pk, "/privateKey.pem", claims);
     }
 
     private static String generateTokenString(PrivateKey privateKey, String kid, JwtClaims claims) throws Exception{
