@@ -49,4 +49,4 @@ database/docker-compose.yml
 
 # Ignorar llaves privadas
 src/main/resources/privateKey.pem
-src/main/resources/publicKey.pem
+src/main/resources/META-INF/resources/publicKey.pem
