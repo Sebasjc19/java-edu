@@ -16,6 +16,7 @@ import java.time.LocalDate;
 @Table(name = "users")
 public class User extends PanacheEntity {
     @NotBlank
+
     private String username;
 
     @NotBlank

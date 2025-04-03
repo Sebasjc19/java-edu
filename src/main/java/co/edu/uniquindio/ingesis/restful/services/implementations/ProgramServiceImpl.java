@@ -119,7 +119,7 @@ public class ProgramServiceImpl implements ProgramService {
 
         // Crear un directorio temporal
         File directorioTemporal = Files.createTempDirectory("programaEjecutado").toFile();
-        File archivoCodigo = new File(directorioTemporal, "Programa.java");
+        File archivoCodigo = new File(directorioTemporal, program.getTitle());
 
         // Guardar el código en un archivo
         try (FileWriter escritor = new FileWriter(archivoCodigo)) {
