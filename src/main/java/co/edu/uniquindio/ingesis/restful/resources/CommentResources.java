@@ -4,6 +4,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.UpdateCommentRequest;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.CommentService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -38,6 +39,7 @@ public class CommentResources {
 
     // 3. Crear un nuevo comentario
     @POST
+    @RolesAllowed({"TUTOR"})
     public Response createComment(@Valid CommentCreationRequest request) {
         CommentResponse commentResponse = commentService.createComment(request);
         return Response.ok(commentResponse).build();

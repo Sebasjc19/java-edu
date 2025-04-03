@@ -35,6 +35,6 @@ public record UserRegistrationRequest(
         Role role) {
 
     public UserRegistrationRequest {
-        role = Objects.requireNonNullElse(role, Role.USER);
+        role = Objects.requireNonNullElse(role, Role.STUDENT);
     }
 }

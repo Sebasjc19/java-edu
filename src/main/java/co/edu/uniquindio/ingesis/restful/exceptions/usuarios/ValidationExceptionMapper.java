@@ -1,5 +1,6 @@
 package co.edu.uniquindio.ingesis.restful.exceptions.usuarios;
 
+import co.edu.uniquindio.ingesis.restful.dtos.MessageDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ErrorResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -20,6 +21,6 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
                 .map(message -> new ErrorResponse("Validation Error", message))
                 .collect(Collectors.toList());
 
-        return Response.status(Response.Status.BAD_REQUEST).entity(errorResponses).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(new MessageDTO<>(true, errorResponses)).build();
     }
 }
