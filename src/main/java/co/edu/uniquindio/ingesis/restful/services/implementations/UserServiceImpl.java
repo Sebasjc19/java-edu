@@ -9,6 +9,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserUpdateRequest;
 import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.EmailAlredyExistsExceptionMapper;
 import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.InactiveUserExceptionMapper;
 import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.UsernameAlredyExistsExceptionMapper;
 import co.edu.uniquindio.ingesis.restful.mappers.UserMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.UserService;
@@ -26,14 +27,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     @Inject  UserMapper userMapper;
+    @Inject
     UserRepository userRepository;
 
     @Transactional
     public UserResponse createUser(UserRegistrationRequest request) {
         User user = userMapper.parseOf(request);
+
         Optional<User> optionalUser = userRepository.findByEmail(request.email());
         if(optionalUser.isPresent()){
             new EmailAlredyExistsExceptionMapper();
+        }
+
+        Optional<User> optionalUser1 = userRepository.findByUsername(request.username());
+        if(optionalUser1.isPresent()){
+            new UsernameAlredyExistsExceptionMapper();
         }
         user.setRegistrationDate(LocalDate.now());
         user.persist();
@@ -42,10 +50,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse findById(Long id) {
+    public UserResponse findById(Long id) throws ResourceNotFoundException {
         User user = User.findById(id);
         if( user == null ){
-            new ResourceNotFoundException();
+            throw new ResourceNotFoundException();
         }
         return userMapper.toUserResponse(user);
     }

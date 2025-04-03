@@ -14,6 +14,8 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.io.*;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -87,11 +89,11 @@ public class ProgramServiceImpl implements ProgramService {
 
     @Override
     @Transactional
-    public ProgramResponse deleteProgram(Long id) {
+    public ProgramResponse deleteProgram(Long id) throws ResourceNotFoundException {
         // Validar si el programa se encuentra en la base de datos
         Optional<Program> optionalProgram = programRepository.findByIdOptional(id);
         if (optionalProgram.isEmpty()) {
-            new ResourceNotFoundException();
+            throw new ResourceNotFoundException();
         }
 
         // Obtener el programa y eliminarlo
@@ -100,4 +102,58 @@ public class ProgramServiceImpl implements ProgramService {
 
         return programMapper.toProgramResponse(program);
     }
+    @Override
+    public String executeProgram(Long programId) throws IOException, InterruptedException, ResourceNotFoundException {
+        // Buscar el programa en la base de datos
+        Optional<Program> optionalProgram = programRepository.findByIdOptional(programId);
+        if (optionalProgram.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        Program program = optionalProgram.get();
+        String codigoFuente = program.getCode();
+
+        if (codigoFuente == null || codigoFuente.isBlank()) {
+            throw new IllegalArgumentException("El código fuente está vacío.");
+        }
+
+        // Crear un directorio temporal
+        File directorioTemporal = Files.createTempDirectory("programaEjecutado").toFile();
+        File archivoCodigo = new File(directorioTemporal, "Programa.java");
+
+        // Guardar el código en un archivo
+        try (FileWriter escritor = new FileWriter(archivoCodigo)) {
+            escritor.write(codigoFuente);
+        }
+
+        // Compilar el archivo .java
+        Process procesoCompilacion = new ProcessBuilder("javac", archivoCodigo.getAbsolutePath())
+                .directory(directorioTemporal)
+                .redirectErrorStream(true)
+                .start();
+
+        procesoCompilacion.waitFor();
+
+        if (procesoCompilacion.exitValue() != 0) {
+            return "Error en la compilación: " + obtenerSalida(procesoCompilacion);
+        }
+
+        // Ejecutar el programa compilado
+        Process procesoEjecucion = new ProcessBuilder("java", "-cp", directorioTemporal.getAbsolutePath(), "Programa")
+                .directory(directorioTemporal)
+                .redirectErrorStream(true)
+                .start();
+
+        procesoEjecucion.waitFor();
+
+        // Obtener la salida de la ejecución
+        return obtenerSalida(procesoEjecucion);
+    }
+
+    private String obtenerSalida(Process proceso) throws IOException {
+        try (BufferedReader lector = new BufferedReader(new InputStreamReader(proceso.getInputStream()))) {
+            return lector.lines().collect(Collectors.joining("\n"));
+        }
+    }
+
 }
