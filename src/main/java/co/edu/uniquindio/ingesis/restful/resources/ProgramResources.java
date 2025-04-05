@@ -3,8 +3,10 @@ package co.edu.uniquindio.ingesis.restful.resources;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -26,6 +28,7 @@ public class ProgramResources {
      * Obtener todos los programas asociados a un usuario.
      */
     @GET
+    @RolesAllowed({"STUDENT", "TUTOR"})
     @Path("/{userId}")
     public Response findProgramsByUserId(@PathParam("userId") Long userId) {
         List<ProgramResponse> programResponses = programService.findProgramsByUserId(userId);
@@ -36,6 +39,7 @@ public class ProgramResources {
      * Obtener un programa por su ID.
      */
     @GET
+    @RolesAllowed({"STUDENT", "TUTOR"})
     @Path("/{id}")
     public Response getProgramById(@PathParam("id") Long id) {
         ProgramResponse programResponse = programService.getProgramById(id);
@@ -46,6 +50,7 @@ public class ProgramResources {
      * Crear un programa por primera vez
      */
     @POST
+    @PermitAll
     public Response createProgram(@Valid ProgramCreationRequest request){
         ProgramResponse programResponse = programService.createProgram(request);
         return Response.status(Response.Status.CREATED).entity(programResponse).build();
@@ -55,6 +60,7 @@ public class ProgramResources {
      * Actualizar un programa
      */
     @PUT
+    @RolesAllowed({"STUDENT", "TUTOR"})
     @Path("/{id}")
     public Response updateProgramById(@PathParam("id") Long id, @Valid UpdateProgramRequest request){
         ProgramResponse programResponse = programService.updateProgramById(id, request);
@@ -65,12 +71,14 @@ public class ProgramResources {
      * Eliminar un programa por ID.
      */
     @DELETE
+    @RolesAllowed({"STUDENT", "TUTOR"})
     @Path("/{id}")
     public Response deleteProgram(@PathParam("id") Long id) throws ResourceNotFoundException {
         ProgramResponse programResponse = programService.deleteProgram(id);
         return Response.ok(programResponse).build();
     }
     @GET
+    @RolesAllowed({"STUDENT", "TUTOR"})
     @Path("/execute/{id}")
     public Response ejecutarPrograma(@PathParam("id") Long id) {
         try {

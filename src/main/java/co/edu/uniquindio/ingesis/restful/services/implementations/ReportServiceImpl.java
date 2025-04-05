@@ -3,7 +3,7 @@ package co.edu.uniquindio.ingesis.restful.services.implementations;
 import co.edu.uniquindio.ingesis.restful.domain.Report;
 import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportResponse;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.ReportMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ReportRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ReportService;

@@ -3,7 +3,7 @@ package co.edu.uniquindio.ingesis.restful.services.implementations;
 import co.edu.uniquindio.ingesis.restful.domain.Notification;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationResponse;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.NotificationMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.NotificationRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.NotificationService;

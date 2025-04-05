@@ -1,8 +1,8 @@
-package co.edu.uniquindio.ingesis.restful.exceptions.usuarios.mappers;
+package co.edu.uniquindio.ingesis.restful.exceptions.users.mappers;
 
 import co.edu.uniquindio.ingesis.restful.dtos.MessageDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ErrorResponse;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.UsernameAlreadyExistsException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.UsernameAlreadyExistsException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;

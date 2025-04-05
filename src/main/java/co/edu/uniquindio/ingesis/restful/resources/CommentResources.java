@@ -24,14 +24,17 @@ public class CommentResources {
     //CRUD
     // 1. Obtener todos los comentarios
     @GET
-    public Response getAllComments() {
-        CommentResponse commentResponse = commentService.getAllComments();
+    @RolesAllowed({"ADMIN"})
+    public Response getAllComments(@QueryParam("page")@DefaultValue("0") int page) {
+        List<CommentResponse> commentResponse = commentService.getAllComments(page);
         return Response.ok(commentResponse).build();
     }
 
     // 2. Obtener un comentario por ID
     @GET
     @Path("/{id}")
+    @RolesAllowed({"STUDENT", "TUTOR"})
+
     public Response getCommentById(@PathParam("id") Long id) {
         CommentResponse commentResponse = commentService.getCommentById(id);
         return Response.ok(commentResponse).build();
@@ -47,6 +50,7 @@ public class CommentResources {
 
     // 4. Actualizar completamente un comentario
     @PUT
+    @RolesAllowed({"TUTOR"})
     @Path("/{id}")
     public Response updateCommentById(@PathParam("id") Long id, @Valid UpdateCommentRequest request) {
         CommentResponse commentResponse = commentService.updateCommentById(id, request);
@@ -55,6 +59,7 @@ public class CommentResources {
 
     // 6. Eliminar un comentario
     @DELETE
+    @RolesAllowed({"TUTOR"})
     @Path("/{id}")
     public Response deleteComment(@PathParam("id") Long id) {
         CommentResponse deleteCommentResponse = commentService.deleteComment(id);
@@ -63,10 +68,11 @@ public class CommentResources {
 
     // 7. Método personalizado: Obtener comentarios realizados segun el profesor
     @GET
+    @RolesAllowed({"STUDENT"})
     @Path("/{professorId}")
-    public Response findCommentsByProfessorId(@PathParam("professorId") Long professorId) {
+    public Response findCommentsByProfessorId(@PathParam("professorId") Long professorId,@QueryParam("page")@DefaultValue("0") int page) {
         //TODO: pendiente de organizar la ruta
-        List<CommentResponse> commentResponseList = commentService.findCommentsByProfessorId(professorId);
+        List<CommentResponse> commentResponseList = commentService.findCommentsByProfessorId(professorId, page);
         return Response.ok(commentResponseList).build();
     }
 }

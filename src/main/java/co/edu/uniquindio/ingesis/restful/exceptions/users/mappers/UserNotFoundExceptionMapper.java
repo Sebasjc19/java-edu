@@ -1,4 +1,4 @@
-package co.edu.uniquindio.ingesis.restful.exceptions.usuarios.mappers;
+package co.edu.uniquindio.ingesis.restful.exceptions.users.mappers;
 
 import co.edu.uniquindio.ingesis.restful.dtos.MessageDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ErrorResponse;

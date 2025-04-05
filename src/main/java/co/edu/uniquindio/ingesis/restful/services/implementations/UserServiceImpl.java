@@ -6,11 +6,10 @@ import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ShowUserRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserUpdateRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.EmailAlreadyExistsException;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.InactiveUserException;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.ResourceNotFoundException;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.UsernameAlreadyExistsException;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.mappers.InactiveUserExceptionMapper;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.EmailAlreadyExistsException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.InactiveUserException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.UsernameAlreadyExistsException;
 import co.edu.uniquindio.ingesis.restful.mappers.UserMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.UserService;
@@ -32,7 +31,8 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Inject  UserMapper userMapper;
+    @Inject
+    UserMapper userMapper;
     @Inject
     UserRepository userRepository;
 
@@ -43,13 +43,13 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.parseOf(request);
 
         Optional<User> optionalUser = userRepository.findByEmail(request.email());
-        if(optionalUser.isPresent()){
-            throw new EmailAlreadyExistsException("El correo '"+ request.email() + "' ya esta registrado");
+        if (optionalUser.isPresent()) {
+            throw new EmailAlreadyExistsException("El correo '" + request.email() + "' ya esta registrado");
         }
 
         Optional<User> optionalUser1 = userRepository.findByUsername(request.username());
-        if(optionalUser1.isPresent()){
-            throw new UsernameAlreadyExistsException("El username '"+request.username()+"' ya esta registrado");
+        if (optionalUser1.isPresent()) {
+            throw new UsernameAlreadyExistsException("El username '" + request.username() + "' ya esta registrado");
         }
         user.setRegistrationDate(LocalDate.now());
         user.setStatus(Status.ACTIVE);
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse findById(Long id) throws ResourceNotFoundException {
         User user = User.findById(id);
-        if( user == null ){
+        if (user == null) {
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
         return userMapper.toUserResponse(user);
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
         // Convertir la lista de entidades en una lista de respuestas DTO
         return users.stream()
                 .map(userMapper::toUserResponse)
-                .collect( Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -86,14 +86,14 @@ public class UserServiceImpl implements UserService {
         // Se obtienen todos los usarios de la base de datos, sin importar su estado lógico
         List<User> users = User.findAll().page(Page.of(page, 10)).list();
 
-        if(users.isEmpty()){
+        if (users.isEmpty()) {
             throw new ResourceNotFoundException("No se encontraron usuarios registrados");
         }
 
         // Convertir la lista de entidades en una lista de respuestas DTO
         return users.stream()
                 .map(userMapper::toUserResponse)
-                .collect( Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
         /*
          Se lanza una excepción en caso de que se intente actualizar un usuario inactivo
          */
-        if(optionalUser.get().getStatus() == Status.INACTIVE){
+        if (optionalUser.get().getStatus() == Status.INACTIVE) {
             throw new InactiveUserException("El usuario esta inactivo");
         }
 
@@ -130,17 +130,12 @@ public class UserServiceImpl implements UserService {
         // Validar si el usuario se encuentra en la base de datos
         Optional<User> optionalUser = userRepository.findByIdOptional(id);
         if (optionalUser.isEmpty()) {
-            new ResourceNotFoundException("Usuario no encontrado");
+            throw new ResourceNotFoundException("Usuario no encontradi");
         }
 
         // Obtener el usuario y cambiar su estado logico a inactivo
         User user = optionalUser.get();
         user.setStatus(Status.INACTIVE);
         user.persist();
-    }
-
-    @Override
-    public UserResponse showUser(Long id, ShowUserRequest showUserRequest) {
-        return null;
     }
 }

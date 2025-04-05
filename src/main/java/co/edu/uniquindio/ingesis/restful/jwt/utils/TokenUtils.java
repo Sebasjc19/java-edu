@@ -1,5 +1,4 @@
 package co.edu.uniquindio.ingesis.restful.jwt.utils;
-
 import org.eclipse.microprofile.jwt.Claims;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
