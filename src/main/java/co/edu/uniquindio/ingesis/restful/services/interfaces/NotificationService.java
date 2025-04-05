@@ -9,7 +9,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationResponse
 import java.util.List;
 
 public interface NotificationService {
-    List<NotificationResponse> findNotificationsByStudentId(Long studentId);
+    List<NotificationResponse> findNotificationsByStudentId(Long studentId,int page);
     NotificationResponse getNotificationById(Long id);
     NotificationResponse createNotification(NotificationCreationRequest request);
     NotificationResponse deleteNotification(Long id);

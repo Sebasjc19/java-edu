@@ -3,6 +3,8 @@ package co.edu.uniquindio.ingesis.restful.resources;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationResponse;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.NotificationService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -20,20 +22,23 @@ public class NotificationResources {
     NotificationService notificationService;
 
     @GET
+    @RolesAllowed({"STUDENT","TUTOR"})
     @Path("/student/{studentId}")
-    public Response getNotificationsByStudentId(@PathParam("studentId") Long studentId) {
+    public Response getNotificationsByStudentId(@PathParam("studentId") Long studentId,@QueryParam("page")@DefaultValue("0") int page) {
         List<NotificationResponse> notificationResponses =
-                notificationService.findNotificationsByStudentId(studentId);
+                notificationService.findNotificationsByStudentId(studentId,page);
+
         return Response.ok(notificationResponses).build();
     }
 
     @GET
+    @RolesAllowed({"STUDENT", "TUTOR"})
     @Path("/{id}")
     public Response getNotificationById(@PathParam("id") Long id) {
         NotificationResponse notificationResponse = notificationService.getNotificationById(id);
         return Response.ok(notificationResponse).build();
     }
-
+    @PermitAll
     @POST
     public Response createNotification(@Valid NotificationCreationRequest request) {
         NotificationResponse notificationResponse = notificationService.createNotification(request);
@@ -41,6 +46,7 @@ public class NotificationResources {
     }
 
     @DELETE
+    @RolesAllowed({"STUDENT","TUTOR"})
     @Path("/{id}")
     public Response deleteNotification(@PathParam("id") Long id) {
         NotificationResponse notificationResponse = notificationService.deleteNotification(id);
