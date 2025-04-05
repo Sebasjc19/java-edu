@@ -1,12 +1,10 @@
 package co.edu.uniquindio.ingesis.restful.services.implementations;
 
 import co.edu.uniquindio.ingesis.restful.domain.Comment;
-import co.edu.uniquindio.ingesis.restful.domain.User;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.UpdateCommentRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.EmailAlredyExistsExceptionMapper;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.CommentMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.CommentRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.CommentService;
@@ -36,7 +34,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse getCommentById(Long id) {
         Comment comment = Comment.findById(id);
         if( comment == null ){
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Comentario no encontrado");
         }
         return commentMapper.toCommentResponse(comment);
     }
@@ -58,7 +56,7 @@ public class CommentServiceImpl implements CommentService {
         // Validar si el comentario se encuentra en la base de datos
         Optional<Comment> optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()) {
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Comentario no encontrado");
         }
 
         Comment comment = optionalComment.get();
@@ -74,7 +72,7 @@ public class CommentServiceImpl implements CommentService {
         // Validar si el comentario se encuentra en la base de datos
         Optional<Comment> optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()) {
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Comentario no encontrado");
         }
 
         // Obtener el comentario y eliminarlo

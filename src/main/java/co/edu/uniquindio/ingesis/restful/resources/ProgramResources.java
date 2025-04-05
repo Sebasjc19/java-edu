@@ -3,7 +3,7 @@ package co.edu.uniquindio.ingesis.restful.resources;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
