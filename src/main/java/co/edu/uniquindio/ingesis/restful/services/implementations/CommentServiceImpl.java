@@ -6,10 +6,7 @@ import co.edu.uniquindio.ingesis.restful.domain.User;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.UpdateCommentRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.comments.CommentNotFoundExceptionMapper;
-import co.edu.uniquindio.ingesis.restful.exceptions.programs.ProgramNotFoundExceptionMapper;
-import co.edu.uniquindio.ingesis.restful.exceptions.users.ResourceNotFoundException;
-import co.edu.uniquindio.ingesis.restful.exceptions.users.UserNotFoundExceptionMapper;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.CommentMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.CommentRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ProgramRepository;
@@ -51,13 +48,10 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse getCommentById(Long id) {
         Optional<Comment>optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()){
-            new CommentNotFoundExceptionMapper();
-        }
+            throw new ResourceNotFoundException("Comentario no encontrado");        }
         Comment comment = optionalComment.get();
         if(comment.getProfessorId() == null){
-            new UserNotFoundExceptionMapper();
-        }
-
+            throw new ResourceNotFoundException("Profesor no encontrado");}
         return commentMapper.toCommentResponse(comment);
     }
 
@@ -67,10 +61,10 @@ public class CommentServiceImpl implements CommentService {
         Optional<User>userOptional = userRepository.findByIdOptional(request.professorId());
         Optional<Program>programOptional = programRepository.findByIdOptional(request.programId());
         if (userOptional.isEmpty()){
-            new UserNotFoundExceptionMapper();
+            throw new ResourceNotFoundException("Profesor no encontrado");
         }
         if (programOptional.isEmpty()){
-            new ProgramNotFoundExceptionMapper();
+            throw new ResourceNotFoundException("Program no encontrado");
         }
         Comment comment = commentMapper.parseOf(request);
         comment.setCreationDate(LocalDate.now());
@@ -86,7 +80,7 @@ public class CommentServiceImpl implements CommentService {
         // Validar si el comentario se encuentra en la base de datos
         Optional<Comment> optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()) {
-            new CommentNotFoundExceptionMapper();
+            new ResourceNotFoundException("Comentario no encontrado");
         }
 
         Comment comment = optionalComment.get();
@@ -102,7 +96,7 @@ public class CommentServiceImpl implements CommentService {
         // Validar si el comentario se encuentra en la base de datos
         Optional<Comment> optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()) {
-            new CommentNotFoundExceptionMapper();
+            new ResourceNotFoundException("Comentario no encontrado");
         }
 
         // Obtener el comentario y eliminarlo
@@ -111,12 +105,12 @@ public class CommentServiceImpl implements CommentService {
 
         return commentMapper.toCommentResponse(comment);
     }
-
+    //TODO: preguntar si es correcto retornar una lista de responses
     @Override
     public List<CommentResponse> findCommentsByProfessorId(Long professorId) {
         Optional<User> usarOptional = userRepository.findByIdOptional(professorId);
         if (usarOptional.isEmpty()){
-            new UserNotFoundExceptionMapper();
+            throw new ResourceNotFoundException("El profesor no se encuentra registrado");
         }
         // Buscar los comentarios del profesor en la base de datos
         List<Comment> comments = commentRepository.findByProfessorId(professorId);

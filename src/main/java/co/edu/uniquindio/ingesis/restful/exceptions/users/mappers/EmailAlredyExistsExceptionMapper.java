@@ -1,9 +1,11 @@
-package co.edu.uniquindio.ingesis.restful.exceptions.users;
+package co.edu.uniquindio.ingesis.restful.exceptions.users.mappers;
 
 import co.edu.uniquindio.ingesis.restful.dtos.MessageDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ErrorResponse;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.EmailAlreadyExistsException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * {@code EmailAlreadyExistsExceptionMapper} es un mapper de excepciones que captura
@@ -25,11 +27,14 @@ import jakarta.ws.rs.ext.ExceptionMapper;
  * }
  * </pre>
  */
-public class EmailAlredyExistsExceptionMapper implements ExceptionMapper<RuntimeException> {
+@Provider
+public class EmailAlredyExistsExceptionMapper implements ExceptionMapper<EmailAlreadyExistsException> {
 
     @Override
-    public Response toResponse(RuntimeException e) {
+    public Response toResponse(EmailAlreadyExistsException e) {
         ErrorResponse errorResponse = new ErrorResponse("Email already exists", e.getMessage());
-        return Response.status(Response.Status.CONFLICT).entity(new MessageDTO<>(true, errorResponse)).build();
+        return Response.status(Response.Status.CONFLICT)
+                .entity(new MessageDTO<>(true, errorResponse))
+                .build();
     }
 }

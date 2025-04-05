@@ -1,5 +1,4 @@
 package co.edu.uniquindio.ingesis.restful.jwt.utils;
-
 import org.eclipse.microprofile.jwt.Claims;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
@@ -11,6 +10,7 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 public class TokenUtils {
@@ -20,15 +20,16 @@ public class TokenUtils {
     public static final String ROLE_STUDENT = "student";
     public static final String ROLE_TUTOR = "tutor";
 
-    public static String generateTokenString(JwtClaims claims) throws Exception{
-        PrivateKey pk = readPrivateKey("/META-INF/privateKey.pem");
-        return generateTokenString(pk, "/META-INF/privateKey.pem", claims);
+    public static String generateTokenString(JwtClaims claims, String role) throws Exception{
+        PrivateKey pk = readPrivateKey("/privateKey.pem");
+        return generateTokenString(pk,"/privateKey.pem", claims, role);
     }
 
-    private static String generateTokenString(PrivateKey privateKey, String kid, JwtClaims claims) throws Exception{
+    private static String generateTokenString(PrivateKey privateKey, String kid, JwtClaims claims, String role) throws Exception{
         long currentTimeInSecs = currentTimeInSecs();
         claims.setIssuedAt(NumericDate.fromSeconds(currentTimeInSecs));
         claims.setClaim(Claims.auth_time.name(), NumericDate.fromSeconds(currentTimeInSecs));
+        claims.setStringListClaim("groups", List.of(role));
         for (Map.Entry<String, Object> entry : claims.getClaimsMap().entrySet()) {
             System.out.printf("\tAdded claim: %s, value: %s\n", entry.getKey(), entry.getValue());
         }

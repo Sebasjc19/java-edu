@@ -4,7 +4,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.MessageDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserUpdateRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.users.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.UserService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -27,19 +27,21 @@ public class UserResources {
     @Path("/{id}")
     @RolesAllowed({"STUDENT", "TUTOR"})
     public Response deleteUser(@PathParam("id") Long id) {
-        UserResponse deleteUserResponse = userService.deleteUser(id);
-        return Response.ok(new MessageDTO<>(false, deleteUserResponse)).build();
+        userService.deleteUser(id);
+        return Response.ok(new MessageDTO<>(false, "Usuario eliminado correctamente")).build();
     }
 
     @GET
-    public Response getAllUsers() {
+    @RolesAllowed({"ADMIN"})
+    public Response getAllUsers(@QueryParam("page")@DefaultValue("0") int page) {
         //Consultar usuarios en la base de datos
-        List<UserResponse> users = userService.getAllUsers();
+        List<UserResponse> users = userService.getAllUsers(page);
         return Response.ok(new MessageDTO<>(false, users)).build();
     }
 
     @GET
     @Path("/{id}")
+    @PermitAll
     public Response findById(@PathParam("id") Long id) throws ResourceNotFoundException {
         UserResponse userResponse = userService.findById(id);
         return Response.ok(new MessageDTO<>(false, userResponse)).build();

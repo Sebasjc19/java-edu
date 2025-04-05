@@ -3,7 +3,7 @@ package co.edu.uniquindio.ingesis.restful.services.implementations;
 import co.edu.uniquindio.ingesis.restful.domain.Notification;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationResponse;
-import co.edu.uniquindio.ingesis.restful.exceptions.users.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.NotificationMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.NotificationRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.NotificationService;
@@ -41,7 +41,7 @@ public class NotificationServiceImpl implements NotificationService {
     public NotificationResponse getNotificationById(Long id) {
         Notification notification = Notification.findById(id);
         if( notification == null ){
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Notificacion no encontrada");
         }
         return notificationMapper.toNotificationResponse(notification);
     }
@@ -61,7 +61,7 @@ public class NotificationServiceImpl implements NotificationService {
         // Validar si la notificación a borrar se encuentra en la base de datos
         Optional<Notification> optionalNotification = notificationRepository.findByIdOptional(id);
         if (optionalNotification.isEmpty()) {
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Notificacion no encontrada");
         }
 
         // Obtener la notificación y eliminarlo

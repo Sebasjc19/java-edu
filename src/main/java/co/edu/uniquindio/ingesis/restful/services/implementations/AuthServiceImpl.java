@@ -34,7 +34,6 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = optionalUser.get();
         //cambiar cuando se encripte la contraseña
-
         if(!BcryptUtil.matches(loginRequest.password(), user.getPassword())){
             throw new Exception("La contraseña es incorrecta");
         }
@@ -46,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
             jwtClaims.setStringClaim("rol", user.getRole().toString());
             jwtClaims.setStringClaim("nombre", user.getUsername());
             jwtClaims.setExpirationTimeMinutesInTheFuture(60);
-            String token = TokenUtils.generateTokenString(jwtClaims);
+            String token = TokenUtils.generateTokenString(jwtClaims, user.getRole().toString());
             // Registrar en el Log
             return new TokenDTO(token);
         }catch (Exception e){

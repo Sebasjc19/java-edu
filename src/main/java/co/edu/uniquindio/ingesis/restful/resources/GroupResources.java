@@ -1,5 +1,6 @@
 package co.edu.uniquindio.ingesis.restful.resources;
 
+import co.edu.uniquindio.ingesis.restful.dtos.MessageDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupResponse;
@@ -29,7 +30,7 @@ public class GroupResources {
     @Path("/{professorId}")
     public Response findGroupsByProfessorId(@PathParam("professorId") Long professorId) {
         List<GroupResponse> groupResponse = groupService.findGroupsByProfessorId(professorId);
-        return Response.ok(groupResponse).build();
+        return Response.ok(new MessageDTO<>(false, groupResponse)).build();
     }
 
     /**
@@ -39,7 +40,7 @@ public class GroupResources {
     @Path("/{id}")
     public Response getGroupById(@PathParam("id") Long id) {
         GroupResponse groupResponse = groupService.getGroupById(id);
-        return Response.ok(groupResponse).build();
+        return Response.ok(new MessageDTO<>(false, groupResponse)).build();
     }
 
     /**
@@ -58,7 +59,7 @@ public class GroupResources {
     @Path("/{id}")
     public Response updateGroupById(@PathParam("id") Long id, @Valid UpdateGroupRequest request) {
         GroupResponse groupResponse = groupService.updateGroupById(id, request);
-        return Response.ok(groupResponse).build();
+        return Response.ok(new MessageDTO<>(false, groupResponse)).build();
     }
 
     /**
@@ -68,6 +69,6 @@ public class GroupResources {
     @Path("/{id}")
     public Response deleteGroup(@PathParam("id") Long id) {
         GroupResponse groupResponse = groupService.deleteGroup(id);
-        return Response.ok(groupResponse).build();
+        return Response.ok(new MessageDTO<>(false, groupResponse)).build();
     }
 }
