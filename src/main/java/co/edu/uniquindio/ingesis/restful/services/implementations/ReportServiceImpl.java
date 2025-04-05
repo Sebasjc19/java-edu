@@ -3,7 +3,7 @@ package co.edu.uniquindio.ingesis.restful.services.implementations;
 import co.edu.uniquindio.ingesis.restful.domain.Report;
 import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportResponse;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.ReportMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ReportRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ReportService;
@@ -29,7 +29,7 @@ public class ReportServiceImpl implements ReportService {
     public ReportResponse getReportById(Long id) {
         Report report = Report.findById(id);
         if( report == null ){
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Reporte no encontrado");
         }
         return reportMapper.toReportResponse(report);
     }
@@ -81,7 +81,7 @@ public class ReportServiceImpl implements ReportService {
         // Validar si el reporte a eliminar se encuentra en la base de datos
         Optional<Report> optionalReport = reportRepository.findByIdOptional(id);
         if (optionalReport.isEmpty()) {
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Reporte no encontrado");
         }
 
         // Obtener el reporte y eliminarlo

@@ -5,7 +5,7 @@ import co.edu.uniquindio.ingesis.restful.domain.Program;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.ProgramMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ProgramRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
@@ -44,7 +44,7 @@ public class ProgramServiceImpl implements ProgramService {
     public ProgramResponse getProgramById(Long id) {
         Program program = Program.findById(id);
         if( program == null ){
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Programa no encontrado");
         }
         return programMapper.toProgramResponse(program);
     }
@@ -67,7 +67,7 @@ public class ProgramServiceImpl implements ProgramService {
         // Validar si el programa se encuentra en la base de datos
         Optional<Program> optionalProgram = programRepository.findByIdOptional(id);
         if (optionalProgram.isEmpty()) {
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Programa no encontrado");
         }
 
         Program program = optionalProgram.get();
@@ -93,7 +93,7 @@ public class ProgramServiceImpl implements ProgramService {
         // Validar si el programa se encuentra en la base de datos
         Optional<Program> optionalProgram = programRepository.findByIdOptional(id);
         if (optionalProgram.isEmpty()) {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("Programa no encontrado");
         }
 
         // Obtener el programa y eliminarlo
@@ -107,7 +107,7 @@ public class ProgramServiceImpl implements ProgramService {
         // Buscar el programa en la base de datos
         Optional<Program> optionalProgram = programRepository.findByIdOptional(programId);
         if (optionalProgram.isEmpty()) {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("Programa no encontrado");
         }
 
         Program program = optionalProgram.get();

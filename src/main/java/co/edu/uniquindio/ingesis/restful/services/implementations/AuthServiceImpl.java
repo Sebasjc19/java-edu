@@ -8,6 +8,7 @@ import co.edu.uniquindio.ingesis.restful.jwt.utils.TokenUtils;
 import co.edu.uniquindio.ingesis.restful.mappers.UserMapper;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.AuthService;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
+import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
@@ -33,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = optionalUser.get();
         //cambiar cuando se encripte la contraseña
-        if(!user.getPassword().equals(loginRequest.password())){
+        if(!BcryptUtil.matches(loginRequest.password(), user.getPassword())){
             throw new Exception("La contraseña es incorrecta");
         }
         try {
@@ -44,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
             jwtClaims.setStringClaim("rol", user.getRole().toString());
             jwtClaims.setStringClaim("nombre", user.getUsername());
             jwtClaims.setExpirationTimeMinutesInTheFuture(60);
-            String token = TokenUtils.generateTokenString(jwtClaims);
+            String token = TokenUtils.generateTokenString(jwtClaims, user.getRole().toString());
             // Registrar en el Log
             return new TokenDTO(token);
         }catch (Exception e){
