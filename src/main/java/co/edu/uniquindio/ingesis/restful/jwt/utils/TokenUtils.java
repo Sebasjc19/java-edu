@@ -21,8 +21,8 @@ public class TokenUtils {
     public static final String ROLE_TUTOR = "tutor";
 
     public static String generateTokenString(JwtClaims claims) throws Exception{
-        PrivateKey pk = readPrivateKey("/privateKey.pem");
-        return generateTokenString(pk, "/privateKey.pem", claims);
+        PrivateKey pk = readPrivateKey("/META-INF/privateKey.pem");
+        return generateTokenString(pk, "/META-INF/privateKey.pem", claims);
     }
 
     private static String generateTokenString(PrivateKey privateKey, String kid, JwtClaims claims) throws Exception{

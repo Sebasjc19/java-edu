@@ -4,7 +4,7 @@ import co.edu.uniquindio.ingesis.restful.domain.Group;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.UpdateGroupRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.GroupMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.GroupRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.GroupService;

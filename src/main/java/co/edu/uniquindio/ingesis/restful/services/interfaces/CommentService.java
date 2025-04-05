@@ -7,7 +7,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.comments.UpdateCommentRequest;
 import java.util.List;
 
 public interface CommentService {
-    CommentResponse getAllComments();
+    List<CommentResponse> getAllComments();
     CommentResponse getCommentById(Long id);
     CommentResponse createComment(CommentCreationRequest request);
     CommentResponse updateCommentById(Long id, UpdateCommentRequest comment);
