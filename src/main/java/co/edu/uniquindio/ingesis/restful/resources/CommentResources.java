@@ -24,9 +24,9 @@ public class CommentResources {
     //CRUD
     // 1. Obtener todos los comentarios
     @GET
-    @RolesAllowed({"STUDENT", "TUTOR"})
-    public Response getAllComments() {
-        List<CommentResponse> commentResponse = commentService.getAllComments();
+    @RolesAllowed({"ADMIN"})
+    public Response getAllComments(@QueryParam("page")@DefaultValue("0") int page) {
+        List<CommentResponse> commentResponse = commentService.getAllComments(page);
         return Response.ok(commentResponse).build();
     }
 
@@ -70,9 +70,9 @@ public class CommentResources {
     @GET
     @RolesAllowed({"STUDENT"})
     @Path("/{professorId}")
-    public Response findCommentsByProfessorId(@PathParam("professorId") Long professorId) {
+    public Response findCommentsByProfessorId(@PathParam("professorId") Long professorId,@QueryParam("page")@DefaultValue("0") int page) {
         //TODO: pendiente de organizar la ruta
-        List<CommentResponse> commentResponseList = commentService.findCommentsByProfessorId(professorId);
+        List<CommentResponse> commentResponseList = commentService.findCommentsByProfessorId(professorId, page);
         return Response.ok(commentResponseList).build();
     }
 }

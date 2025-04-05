@@ -7,10 +7,10 @@ import co.edu.uniquindio.ingesis.restful.dtos.comments.UpdateCommentRequest;
 import java.util.List;
 
 public interface CommentService {
-    List<CommentResponse> getAllComments();
+    List<CommentResponse> getAllComments(int page);
     CommentResponse getCommentById(Long id);
     CommentResponse createComment(CommentCreationRequest request);
     CommentResponse updateCommentById(Long id, UpdateCommentRequest comment);
     CommentResponse deleteComment(Long id);
-    List<CommentResponse> findCommentsByProfessorId(Long professorId);
+    List<CommentResponse> findCommentsByProfessorId(Long professorId,int page);
 }

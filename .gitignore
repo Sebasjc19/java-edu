@@ -48,7 +48,7 @@ nb-configuration.xml
 database/docker-compose.yml
 
 # Ignorar llaves privadas
-src/main/resources/META-INF/private_key.pem
+src/main/resources/private_key.pem
 src/main/resources/META-INF/resources/public_key.pem
 
 # Ignorar logs

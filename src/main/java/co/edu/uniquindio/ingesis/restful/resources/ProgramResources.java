@@ -5,6 +5,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
 import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -49,7 +50,7 @@ public class ProgramResources {
      * Crear un programa por primera vez
      */
     @POST
-    @RolesAllowed({"STUDENT", "TUTOR"})
+    @PermitAll
     public Response createProgram(@Valid ProgramCreationRequest request){
         ProgramResponse programResponse = programService.createProgram(request);
         return Response.status(Response.Status.CREATED).entity(programResponse).build();

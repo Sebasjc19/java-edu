@@ -54,7 +54,7 @@ public class ProgramServiceImpl implements ProgramService {
     public ProgramResponse getProgramById(Long id) {
         Optional<Program> programOptional = programRepository.findByIdOptional(id);
         if (programOptional.isEmpty()) {
-            new ResourceNotFoundException("Programa no encontrado");
+            throw  new ResourceNotFoundException("Programa no encontrado");
         }
         Program program = programOptional.get();
         return programMapper.toProgramResponse(program);
@@ -77,7 +77,7 @@ public class ProgramServiceImpl implements ProgramService {
         // Validar si el programa se encuentra en la base de datos
         Optional<Program> optionalProgram = programRepository.findByIdOptional(id);
         if (optionalProgram.isEmpty()) {
-            new ResourceNotFoundException("Programa no encontrado");
+            throw  new ResourceNotFoundException("Programa no encontrado");
         }
 
         Program program = optionalProgram.get();

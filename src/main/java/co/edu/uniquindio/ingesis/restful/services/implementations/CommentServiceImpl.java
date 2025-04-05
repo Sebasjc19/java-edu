@@ -12,12 +12,14 @@ import co.edu.uniquindio.ingesis.restful.repositories.interfaces.CommentReposito
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ProgramRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.CommentService;
+import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,9 +36,10 @@ public class CommentServiceImpl implements CommentService {
     @Inject
     ProgramRepository programRepository;
     @Override
-    public List<CommentResponse> getAllComments() {
+    public List<CommentResponse> getAllComments(int page) {
         // Se obtienen todos los comentarios  de la base de datos, sin importar su estado lógico
-        List<Comment> comments = Comment.listAll();
+        List<Comment> comments = Comment.findAll().page(Page.of(page,10)).list();
+
 
         // Convertir la lista de entidades en una lista de respuestas DTO
         return comments.stream().
@@ -80,7 +83,7 @@ public class CommentServiceImpl implements CommentService {
         // Validar si el comentario se encuentra en la base de datos
         Optional<Comment> optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()) {
-            new ResourceNotFoundException("Comentario no encontrado");
+            throw new ResourceNotFoundException("Comentario no encontrado");
         }
 
         Comment comment = optionalComment.get();
@@ -96,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
         // Validar si el comentario se encuentra en la base de datos
         Optional<Comment> optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()) {
-            new ResourceNotFoundException("Comentario no encontrado");
+            throw new ResourceNotFoundException("Comentario no encontrado");
         }
 
         // Obtener el comentario y eliminarlo
@@ -107,17 +110,30 @@ public class CommentServiceImpl implements CommentService {
     }
     //TODO: preguntar si es correcto retornar una lista de responses
     @Override
-    public List<CommentResponse> findCommentsByProfessorId(Long professorId) {
-        Optional<User> usarOptional = userRepository.findByIdOptional(professorId);
-        if (usarOptional.isEmpty()){
+    public List<CommentResponse> findCommentsByProfessorId(Long professorId, int page) {
+        Optional<User> userOptional = userRepository.findByIdOptional(professorId);
+        if (userOptional.isEmpty()) {
             throw new ResourceNotFoundException("El profesor no se encuentra registrado");
         }
-        // Buscar los comentarios del profesor en la base de datos
-        List<Comment> comments = commentRepository.findByProfessorId(professorId);
-        // Convertir la lista de entidades en una lista de respuestas DTO
-        return comments.stream()
+
+        // Obtener todos los comentarios
+        List<Comment> allComments = commentRepository.findByProfessorId(professorId);
+
+        int size = 10; // Tamaño fijo de página
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, allComments.size());
+
+        if (fromIndex >= allComments.size()) {
+            return Collections.emptyList();
+        }
+
+        List<Comment> paginatedComments = allComments.subList(fromIndex, toIndex);
+
+        return paginatedComments.stream()
                 .map(commentMapper::toCommentResponse)
-                .collect( Collectors.toList());
+                .collect(Collectors.toList());
     }
+
+
 
 }

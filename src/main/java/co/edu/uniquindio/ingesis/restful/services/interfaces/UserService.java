@@ -12,7 +12,6 @@ public interface UserService {
     UserResponse createUser(UserRegistrationRequest request);
     UserResponse findById(Long id) throws ResourceNotFoundException;
     void deleteUser(Long id);
-    UserResponse showUser(Long id, ShowUserRequest showUserRequest);
     List<UserResponse> getActiveUsers();
     List<UserResponse> getAllUsers(int page);
     UserResponse updateUserById(Long id, UserUpdateRequest request);
