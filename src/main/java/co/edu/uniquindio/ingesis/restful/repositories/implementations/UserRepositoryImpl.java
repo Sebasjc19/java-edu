@@ -13,7 +13,7 @@ import java.util.Optional;
 public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findByEmail(String email) {
-        Optional<User> userOptional = find("email", email).firstResultOptional();
+        Optional<User> userOptional = find("email", email).stream().findAny();
         return userOptional;
     }
 
