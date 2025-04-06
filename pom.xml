@@ -125,6 +125,7 @@
             <artifactId>quarkus-smallrye-health</artifactId>
         </dependency>
         <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+        <!-- Herramienta de monitoreo -->
     </dependencies>
 
     <build>
