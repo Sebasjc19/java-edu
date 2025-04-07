@@ -7,6 +7,8 @@ import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.UpdateGroupRequest;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.CommentService;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.GroupService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -28,6 +30,7 @@ public class GroupResources {
      */
     @GET
     @Path("/{professorId}")
+    @RolesAllowed({"TUTOR"})
     public Response findGroupsByProfessorId(@PathParam("professorId") Long professorId) {
         List<GroupResponse> groupResponse = groupService.findGroupsByProfessorId(professorId);
         return Response.ok(new MessageDTO<>(false, groupResponse)).build();
@@ -38,6 +41,7 @@ public class GroupResources {
      */
     @GET
     @Path("/{id}")
+    @PermitAll
     public Response getGroupById(@PathParam("id") Long id) {
         GroupResponse groupResponse = groupService.getGroupById(id);
         return Response.ok(new MessageDTO<>(false, groupResponse)).build();
@@ -47,6 +51,7 @@ public class GroupResources {
      * Crear un nuevo grupo.
      */
     @POST
+    @RolesAllowed({"TUTOR"})
     public Response createGroup(@Valid GroupCreationRequest request) {
         GroupResponse groupResponse = groupService.createGroup(request);
         return Response.status(Response.Status.CREATED).entity(groupResponse).build();
@@ -57,6 +62,7 @@ public class GroupResources {
      */
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"TUTOR"})
     public Response updateGroupById(@PathParam("id") Long id, @Valid UpdateGroupRequest request) {
         GroupResponse groupResponse = groupService.updateGroupById(id, request);
         return Response.ok(new MessageDTO<>(false, groupResponse)).build();
@@ -67,6 +73,7 @@ public class GroupResources {
      */
     @DELETE
     @Path("/{id}")
+    @RolesAllowed({"TUTOR", "ADMIN"})
     public Response deleteGroup(@PathParam("id") Long id) {
         GroupResponse groupResponse = groupService.deleteGroup(id);
         return Response.ok(new MessageDTO<>(false, groupResponse)).build();
