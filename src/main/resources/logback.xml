@@ -37,6 +37,7 @@
 
     <!-- Root logger para logs generales -->
     <root level="INFO">
+        <appender-ref ref="AUDIT_FILE" />
         <appender-ref ref="STDOUT" />
         <appender-ref ref="TCP" />
     </root>
