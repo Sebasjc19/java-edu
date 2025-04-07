@@ -54,3 +54,6 @@ src/main/resources/META-INF/resources/publicKey.pem
 
 # Ignorar logs
 logs
+
+# ignorar la bd
+bd
