@@ -4,7 +4,7 @@ import co.edu.uniquindio.ingesis.restful.domain.Group;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.UpdateGroupRequest;
-import co.edu.uniquindio.ingesis.restful.exceptions.usuarios.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.GroupMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.GroupRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.GroupService;
@@ -41,7 +41,7 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse getGroupById(Long id) {
         Group group = Group.findById(id);
         if( group == null ){
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Grupo no encontrado");
         }
         return groupMapper.toGroupResponse(group);
     }
@@ -62,7 +62,7 @@ public class GroupServiceImpl implements GroupService {
         // Validar si el grupo se encuentra en la base de datos
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(id);
         if (optionalGroup.isEmpty()) {
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Grupo no encontrado");
         }
 
         Group group = optionalGroup.get();
@@ -80,7 +80,7 @@ public class GroupServiceImpl implements GroupService {
         // Validar si el grupo se encuentra en la base de datos
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(id);
         if (optionalGroup.isEmpty()) {
-            new ResourceNotFoundException();
+            new ResourceNotFoundException("Grupo no encontrado");
         }
 
         // Obtener el grupo y eliminarlo

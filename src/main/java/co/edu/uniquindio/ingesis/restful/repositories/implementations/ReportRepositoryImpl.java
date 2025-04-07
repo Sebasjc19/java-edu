@@ -2,10 +2,12 @@ package co.edu.uniquindio.ingesis.restful.repositories.implementations;
 
 import co.edu.uniquindio.ingesis.restful.domain.Report;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ReportRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@ApplicationScoped
 public class ReportRepositoryImpl implements ReportRepository {
     @Override
     public List<Report> findReportsByProfessorId(Long professorId) {

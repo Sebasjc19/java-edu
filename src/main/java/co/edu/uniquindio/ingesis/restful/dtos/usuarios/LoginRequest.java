@@ -1,7 +1,10 @@
 package co.edu.uniquindio.ingesis.restful.dtos.usuarios;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public record LoginRequest(
-        String email,
-        String password
+        @NotBlank String email,
+        @NotNull String password
 ) {
 }
