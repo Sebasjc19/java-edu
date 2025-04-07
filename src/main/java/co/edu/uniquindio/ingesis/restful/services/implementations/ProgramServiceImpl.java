@@ -15,6 +15,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -34,6 +36,7 @@ public class ProgramServiceImpl implements ProgramService {
     @Inject
     UserRepository userRepository;
 
+    private static final Logger auditLogger = LoggerFactory.getLogger("audit");
 
     @Override
     public List<ProgramResponse> findProgramsByUserId(Long userId) {
@@ -43,6 +46,8 @@ public class ProgramServiceImpl implements ProgramService {
         }
         // Se buscan los programas en base al id del usuario en la base de datos
         List<Program> programs = programRepository.findByUserId(userId);
+
+        auditLogger.info("Consulta de programas por usuario: userId='{}', total='{}'", userId, programs.size());
 
         // Convertir la lista de entidades en una lista de respuestas DTO
         return programs.stream()
@@ -57,6 +62,9 @@ public class ProgramServiceImpl implements ProgramService {
             throw  new ResourceNotFoundException("Programa no encontrado");
         }
         Program program = programOptional.get();
+
+        auditLogger.info("Consulta de programa por ID: id='{}', título='{}'", id, program.getTitle());
+
         return programMapper.toProgramResponse(program);
     }
 
@@ -66,6 +74,9 @@ public class ProgramServiceImpl implements ProgramService {
         Program program = programMapper.parseOf(request);
         program.setCreationDate(LocalDate.now());
         program.persist();
+
+        auditLogger.info("Programa creado: título='{}', código='{}', fecha de creación='{}'",
+                program.getTitle(), program.getCode(), program.getCreationDate());
 
         return programMapper.toProgramResponse(program);
     }
@@ -93,6 +104,9 @@ public class ProgramServiceImpl implements ProgramService {
 
         program.persist();
 
+        auditLogger.info("Programa actualizado: id='{}', nuevo título='{}', nueva descripción='{}'",
+                id, program.getTitle(), program.getDescription());
+
         // Convertir entidad en DTO de respuesta
         return programMapper.toProgramResponse(program);
     }
@@ -109,6 +123,9 @@ public class ProgramServiceImpl implements ProgramService {
         // Obtener el programa y eliminarlo
         Program program = optionalProgram.get();
         program.delete();
+
+        auditLogger.info("Programa eliminado: id='{}', título='{}'", id, program.getTitle());
+
 
         return programMapper.toProgramResponse(program);
     }
@@ -155,6 +172,8 @@ public class ProgramServiceImpl implements ProgramService {
                 .start();
 
         procesoEjecucion.waitFor();
+
+        auditLogger.info("Ejecutando programa: id='{}', título='{}'", programId, program.getTitle());
 
         // Obtener la salida de la ejecución
         return obtenerSalida(procesoEjecucion);

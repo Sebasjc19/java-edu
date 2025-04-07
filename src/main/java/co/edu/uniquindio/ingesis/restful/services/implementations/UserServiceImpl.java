@@ -2,7 +2,6 @@ package co.edu.uniquindio.ingesis.restful.services.implementations;
 
 import co.edu.uniquindio.ingesis.restful.domain.Status;
 import co.edu.uniquindio.ingesis.restful.domain.User;
-import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ShowUserRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserUpdateRequest;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 @ApplicationScoped
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -36,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Inject
     UserRepository userRepository;
 
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger("AUDIT");
+    private static final Logger auditLogger = LoggerFactory.getLogger("audit");
 
     @Transactional
     public UserResponse createUser(UserRegistrationRequest request) {
@@ -55,7 +53,9 @@ public class UserServiceImpl implements UserService {
         user.setStatus(Status.ACTIVE);
         user.persist();
 
-        AUDIT_LOGGER.info("User created: {}", request.email());
+
+        auditLogger.info("Usuario creado: username='{}', email='{}'", request.username(), request.email());
+
         return userMapper.toUserResponse(user);
     }
 
@@ -65,6 +65,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
+
+        auditLogger.info("Consulta de usuario por ID: id='{}'", id);
+
         return userMapper.toUserResponse(user);
     }
 
@@ -73,6 +76,8 @@ public class UserServiceImpl implements UserService {
 
         // Se obtienen solo los usuarios activos en la base de datos
         List<User> users = userRepository.getActiveUsers();
+
+        auditLogger.info("Consulta de usuarios activos. Total encontrados: {}", users.size());
 
         // Convertir la lista de entidades en una lista de respuestas DTO
         return users.stream()
@@ -89,6 +94,9 @@ public class UserServiceImpl implements UserService {
         if (users.isEmpty()) {
             throw new ResourceNotFoundException("No se encontraron usuarios registrados");
         }
+
+        auditLogger.info("Consulta de todos los usuarios. Página: {}, Total encontrados: {}", page, users.size());
+
 
         // Convertir la lista de entidades en una lista de respuestas DTO
         return users.stream()
@@ -120,6 +128,8 @@ public class UserServiceImpl implements UserService {
 
         user.persist();
 
+        auditLogger.info("Usuario actualizado: id='{}', nuevo username='{}', nuevo email='{}'", id, request.username(), request.email());
+
         return userMapper.toUserResponse(user);
     }
 
@@ -132,6 +142,9 @@ public class UserServiceImpl implements UserService {
         if (optionalUser.isEmpty()) {
             throw new ResourceNotFoundException("Usuario no encontradi");
         }
+
+        auditLogger.info("Usuario desactivado (borrado lógico): id='{}'", id);
+
 
         // Obtener el usuario y cambiar su estado logico a inactivo
         User user = optionalUser.get();

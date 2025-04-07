@@ -17,6 +17,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -35,11 +37,15 @@ public class CommentServiceImpl implements CommentService {
     UserRepository userRepository;
     @Inject
     ProgramRepository programRepository;
+    private static final Logger auditLogger = LoggerFactory.getLogger("audit");
+
     @Override
     public List<CommentResponse> getAllComments(int page) {
         // Se obtienen todos los comentarios  de la base de datos, sin importar su estado lógico
         List<Comment> comments = Comment.findAll().page(Page.of(page,10)).list();
 
+        auditLogger.info("consulta todos los comentarios, página '{}', total='{}'",
+                 page, comments.size());
 
         // Convertir la lista de entidades en una lista de respuestas DTO
         return comments.stream().
@@ -55,6 +61,9 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = optionalComment.get();
         if(comment.getProfessorId() == null){
             throw new ResourceNotFoundException("Profesor no encontrado");}
+
+        auditLogger.info("consulta comentario: id='{}'", id);
+
         return commentMapper.toCommentResponse(comment);
     }
 
@@ -73,6 +82,9 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreationDate(LocalDate.now());
         comment.persist();
 
+        auditLogger.info("Creación comentario: profesorId='{}', programaId='{}'",
+                 request.professorId(), request.programId());
+
         return commentMapper.toCommentResponse(comment);
     }
 
@@ -88,6 +100,8 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = optionalComment.get();
         comment.setContent(request.content());
+
+        auditLogger.info("actualización comentario: id='{}'", id);
 
         // Convertir entidad en DTO de respuesta
         return commentMapper.toCommentResponse(comment);
@@ -105,6 +119,8 @@ public class CommentServiceImpl implements CommentService {
         // Obtener el comentario y eliminarlo
         Comment comment = optionalComment.get();
         comment.delete();
+
+        auditLogger.info("Eliminación comentario: id='{}'", id);
 
         return commentMapper.toCommentResponse(comment);
     }
@@ -128,6 +144,9 @@ public class CommentServiceImpl implements CommentService {
         }
 
         List<Comment> paginatedComments = allComments.subList(fromIndex, toIndex);
+
+        auditLogger.info("Consulta comentarios del profesor: profesorId='{}', página='{}', total='{}'",
+                 professorId, page, paginatedComments.size());
 
         return paginatedComments.stream()
                 .map(commentMapper::toCommentResponse)
