@@ -12,6 +12,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,11 +27,16 @@ public class GroupServiceImpl implements GroupService {
     GroupMapper groupMapper;
     GroupRepository groupRepository;
 
+    private static final Logger auditLogger = LoggerFactory.getLogger("audit");
+
     @Override
     public List<GroupResponse> findGroupsByProfessorId(Long professorId) {
 
         // Buscar los grupos del profesor en la base de datos
         List<Group> groups = groupRepository.findByProfessorId(professorId);
+
+        auditLogger.info("Consulta de grupos por profesor: professorId='{}', total='{}'",
+                professorId, groups.size());
 
         // Convertir la lista de entidades en una lista de respuestas DTO
         return groups.stream()
@@ -43,6 +50,10 @@ public class GroupServiceImpl implements GroupService {
         if( group == null ){
             new ResourceNotFoundException("Grupo no encontrado");
         }
+
+        auditLogger.info("Consulta de grupo por ID: groupId='{}'",
+                id);
+
         return groupMapper.toGroupResponse(group);
     }
 
@@ -51,6 +62,9 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse createGroup(GroupCreationRequest request) {
         Group group = groupMapper.parseOf(request);
         group.persist();
+
+        auditLogger.info("Grupo creado: nombre='{}', profesorId='{}'",
+                request.name(), request.idProfessor());
 
         return groupMapper.toGroupResponse(group);
     }
@@ -70,6 +84,9 @@ public class GroupServiceImpl implements GroupService {
         group.setIdProfessor(request.idProfessor());
         group.persist();
 
+        auditLogger.info("Grupo actualizado: id='{}', nuevoNombre='{}', nuevoProfesorId='{}'",
+                id, request.name(), request.idProfessor());
+
         // Convertir entidad en DTO de respuesta
         return groupMapper.toGroupResponse(group);
     }
@@ -86,6 +103,9 @@ public class GroupServiceImpl implements GroupService {
         // Obtener el grupo y eliminarlo
         Group group = optionalGroup.get();
         group.delete();
+
+        auditLogger.info("Grupo eliminado: id='{}'",
+                id);
 
         return groupMapper.toGroupResponse(group);
     }

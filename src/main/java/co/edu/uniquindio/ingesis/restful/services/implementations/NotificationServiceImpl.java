@@ -14,6 +14,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.jose4j.jwk.Use;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -32,6 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Inject
     UserRepository userRepository;
 
+    private static final Logger auditLogger = LoggerFactory.getLogger("audit");
 
     @Override
     public List<NotificationResponse> findNotificationsByStudentId(Long studentId, int page) {
@@ -48,6 +51,9 @@ public class NotificationServiceImpl implements NotificationService {
 
         List<Notification> paginatedNotifications = notifications.subList(fromIndex, toIndex);
 
+        auditLogger.info("Consulta de notificaciones: studentId='{}', page='{}', resultados='{}'",
+                studentId, page, paginatedNotifications.size());
+
         // Convertir la lista de entidades en una lista de respuestas DTO
         return paginatedNotifications.stream()
                 .map(notificationMapper::toNotificationResponse)
@@ -61,6 +67,10 @@ public class NotificationServiceImpl implements NotificationService {
             throw  new ResourceNotFoundException("Notificacion no encontrada");
         }
         Notification notification = optionalNotification.get();
+
+        auditLogger.info("Consulta de notificación por ID: id='{}'",
+                id);
+
         return notificationMapper.toNotificationResponse(notification);
     }
 
@@ -74,6 +84,9 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setSentDate(LocalDate.now());
         notification.setRead(false);
         notification.persist();
+
+        auditLogger.info("Notificación creada: destinatarioId='{}', fecha='{}'"
+                , request.studentId(), notification.getSentDate());
 
         return notificationMapper.toNotificationResponse(notification);
     }
@@ -89,6 +102,9 @@ public class NotificationServiceImpl implements NotificationService {
         // Obtener la notificación y eliminarlo
         Notification notification = optionalNotification.get();
         notification.delete();
+
+        auditLogger.info("Notificación eliminada: id='{}'",
+                id);
 
         return notificationMapper.toNotificationResponse(notification);
     }

@@ -16,6 +16,8 @@ import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.jose4j.jwk.Use;
 import org.jose4j.jwt.JwtClaims;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -27,6 +29,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Inject
     UserRepository userRepository;
+
+    private static final Logger auditLogger = LoggerFactory.getLogger("audit");
+
     public TokenDTO userLogin(LoginRequest loginRequest) throws Exception {
         Optional<User> optionalUser = userRepository.findByEmail(loginRequest.email());
         if (optionalUser.isEmpty()){
@@ -38,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
             throw new Exception("La contraseña es incorrecta");
         }
         try {
+
             JwtClaims jwtClaims = new JwtClaims();
             jwtClaims.setIssuer("Java-edu");
             jwtClaims.setSubject(user.getEmail());
@@ -46,6 +52,8 @@ public class AuthServiceImpl implements AuthService {
             jwtClaims.setStringClaim("nombre", user.getUsername());
             jwtClaims.setExpirationTimeMinutesInTheFuture(60);
             String token = TokenUtils.generateTokenString(jwtClaims, user.getRole().toString());
+
+            auditLogger.info("Login exitoso para usuario '{}'", user.getEmail());
             // Registrar en el Log
             return new TokenDTO(token);
         }catch (Exception e){
