@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
 
         user.persist();
 
-        auditLogger.info("Usuario actualizado: id='{}', nuevo username='{}', nuevo email='{}'", id, request.username().get(), request.email().get());
+        auditLogger.info("Usuario actualizado: id='{}', nuevo username='{}', nuevo email='{}'", id, request.username(), request.email());
 
         return userMapper.toUserResponse(user);
     }
