@@ -4,6 +4,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
 import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.services.implementations.JavaExecutionServiceImpl;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -12,6 +13,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.List;
 public class ProgramResources {
 
     ProgramService programService;
+    JavaExecutionServiceImpl executeProgramService;
 
     /**
      * Obtener todos los programas asociados a un usuario.
@@ -77,15 +80,20 @@ public class ProgramResources {
         ProgramResponse programResponse = programService.deleteProgram(id);
         return Response.ok(programResponse).build();
     }
-    @GET
-    @RolesAllowed({"STUDENT", "TUTOR"})
-    @Path("/execute/{id}")
-    public Response ejecutarPrograma(@PathParam("id") Long id) {
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response ejecutarPrograma(String codigo) {
         try {
-            String resultado = programService.executeProgram(id);
+            String resultado = executeProgramService.ejecutarCodigo(codigo);
             return Response.ok(resultado).build();
-        } catch (IOException | InterruptedException | ResourceNotFoundException e) {
+        } catch (SecurityException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Código no permitido: " + e.getMessage()).build();
+        } catch (IOException | InterruptedException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al ejecutar: " + e.getMessage()).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error inesperado: " + e.getMessage()).build();
         }
     }
 }
