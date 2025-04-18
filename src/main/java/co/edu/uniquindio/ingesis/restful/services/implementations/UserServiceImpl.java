@@ -2,7 +2,6 @@ package co.edu.uniquindio.ingesis.restful.services.implementations;
 
 import co.edu.uniquindio.ingesis.restful.domain.Status;
 import co.edu.uniquindio.ingesis.restful.domain.User;
-import co.edu.uniquindio.ingesis.restful.dtos.usuarios.ShowUserRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserUpdateRequest;
@@ -36,7 +35,7 @@ public class UserServiceImpl implements UserService {
     @Inject
     UserRepository userRepository;
     @Inject
-    SendEmailServiceImpl sendEmailService;
+    EmailServiceImpl sendEmailService;
 
     private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger("AUDIT");
 
@@ -61,7 +60,7 @@ public class UserServiceImpl implements UserService {
         String mensaje = "Hola " + user.getUsername() + ",\n\n" +
                 "Gracias por registrarte. ¡Nos alegra tenerte con nosotros!";
 
-        sendEmailService.enviarCorreo(user.getEmail(), asunto, mensaje);
+        sendEmailService.sendEmail(user.getEmail(), asunto, mensaje);
 
         AUDIT_LOGGER.info("User created: {}", request.email());
         return userMapper.toUserResponse(user);
