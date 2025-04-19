@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         String mensaje = "Hola " + user.getUsername() + ",\n\n" +
                 "Gracias por registrarte. ¡Nos alegra tenerte con nosotros!";
 
-        sendEmailService.enviarCorreo(user.getEmail(), asunto, mensaje);
+        //sendEmailService.enviarCorreo(user.getEmail(), asunto, mensaje);
 
 
         auditLogger.info("Usuario creado: username='{}', email='{}'", request.username(), request.email());

@@ -5,6 +5,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationResponse
 import co.edu.uniquindio.ingesis.restful.services.interfaces.NotificationService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -18,7 +19,7 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor
 public class NotificationResources {
-
+    @Inject
     NotificationService notificationService;
 
     @GET
@@ -41,8 +42,8 @@ public class NotificationResources {
     @PermitAll
     @POST
     public Response createNotification(@Valid NotificationCreationRequest request) {
-        NotificationResponse notificationResponse = notificationService.createNotification(request);
-        return Response.status(Response.Status.CREATED).entity(notificationResponse).build();
+        notificationService.sendNotification(request);
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @DELETE

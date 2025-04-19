@@ -11,6 +11,6 @@ import java.util.List;
 public interface NotificationService {
     List<NotificationResponse> findNotificationsByStudentId(Long studentId,int page);
     NotificationResponse getNotificationById(Long id);
-    NotificationResponse createNotification(NotificationCreationRequest request);
+    void sendNotification(NotificationCreationRequest request);
     NotificationResponse deleteNotification(Long id);
 }
