@@ -4,6 +4,7 @@ import co.edu.uniquindio.ingesis.restful.domain.Comment;
 import co.edu.uniquindio.ingesis.restful.domain.Notification;
 import co.edu.uniquindio.ingesis.restful.domain.User;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationCreationRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationResponse;
 import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.NotificationMapper;
@@ -83,7 +84,9 @@ public class NotificationServiceImpl implements NotificationService {
         if(useOptional.isEmpty()){
             throw new ResourceNotFoundException("No se encuentra un estudiante");
         }
-        notificationProducer.sendNotificacion(request);
+        User user = useOptional.get();
+        NotificationDTO notificationDTO = new NotificationDTO(user.getEmail(),"Creacion de cuenta",request.message());
+        notificationProducer.sendNotificacion(notificationDTO);
 
         //Notification notification = notificationMapper.parseOf(request);
         //notification.setSentDate(LocalDate.now());

@@ -1,6 +1,7 @@
 package co.edu.uniquindio.ingesis.restful.producers;
 
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationCreationRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationDTO;
 import co.edu.uniquindio.ingesis.restful.exceptions.notifications.implementations.NotificationSendException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,11 +14,12 @@ public class NotificationProducer {
     @Channel("notificaciones")
     Emitter<String> emitter;
 
-    public void sendNotificacion(NotificationCreationRequest request) {
+    public void sendNotificacion(NotificationDTO request) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(request);
             emitter.send(json);
+            System.out.println("Mensaje enviado: " + json);
         } catch (JsonProcessingException e) {
             throw new NotificationSendException("Error al serializar la notificación a JSON");
         }
