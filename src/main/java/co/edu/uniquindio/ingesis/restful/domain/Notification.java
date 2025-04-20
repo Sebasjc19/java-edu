@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "notifications")
 public class Notification extends PanacheEntity {
-    @Size(min = 3, max = 20)
+    @Size(min = 3, max = 50)
     private String message;
     private LocalDate sentDate;
     private boolean read;
