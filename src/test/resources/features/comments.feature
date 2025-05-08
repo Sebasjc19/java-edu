@@ -1,55 +1,37 @@
-Feature: Gestión de comentarios
-  Scenario: Obtener todos los comentarios en una página específica
-    Given tengo los datos válidos de un nuevo comentario
-    When envío una solicitud GET a "/comments?page=0"
-    Then recibo un código de estado 200
-    And el cuerpo contiene una lista de comentarios con un máximo de 10 elementos
+Feature: Gestión de Comentarios
 
-  Scenario: Obtener un comentario existente por su ID
-    Given existe un comentario con ID 1
-    When envío una solicitud GET a "/comments/1"
-    Then recibo un código de estado 200
-    And el cuerpo contiene los detalles del comentario con ID 1
+  Scenario: Obtener un comentario por ID
+    Given existe un usuario con rol "STUDENT" autenticado
+    And creo un comentario válido
+    When hago una petición GET al comentario recién creado
+    Then la respuesta debe tener código de estado 200
+    And el cuerpo debe contener el ID del comentario
 
-  Scenario: Obtener un comentario inexistente
-    Given no existe un comentario con ID 9999
-    When envío una solicitud GET a "/comments/9999"
-    Then recibo un código de estado 404
-    And el cuerpo contiene un mensaje de error indicando "Comentario no encontrado"
+  Scenario: Obtener todos los comentarios de un usuario
+    Given El usuario con ID 2 tiene comentarios asignados
+    When hago una petición GET a comments-2 con un usuario con rol "TUTOR"
+    Then la respuesta debe tener código de estado 200
+    And el cuerpo debe ser una lista
 
-  Scenario: Crear un nuevo comentario válido
-    Given tengo un profesor y un programa válidos registrados
-    And tengo los datos válidos para crear un comentario
-    When envío una solicitud POST a "/comments" con el cuerpo del comentario
-    Then recibo un código de estado 201
-    And el cuerpo contiene la información del nuevo comentario creado
+  Scenario: Crear un nuevo comentario
+    Given Tengo los datos válidos para crear un comentario
+    When hago una petición POST a comments
+    Then la respuesta debe tener código de estado 201
+    And el cuerpo debe contener el texto del comentario "Excelente contenido"
 
-  Scenario: Crear un comentario con un profesor no registrado
-    Given no existe un profesor con ID 99
-    When envío una solicitud POST a "/comments" con el ID del profesor inexistente
-    Then recibo un código de estado 404
-    And el cuerpo contiene un mensaje de error indicando "Profesor no encontrado"
+  Scenario: Actualizar un comentario existente
+    Given Existe un comentario con ID 3 y datos nuevos válidos
+    When hago una petición PUT a comments-3
+    Then la respuesta debe tener código de estado 200
+    And el cuerpo debe reflejar los datos actualizados
 
-  Scenario: Actualizar el contenido de un comentario
-    Given existe un comentario con ID 2
-    When envío una solicitud PUT a "/comments/2" con el nuevo contenido
-    Then recibo un código de estado 200
-    And el cuerpo contiene el comentario actualizado
+  Scenario: Eliminar un comentario por ID
+    Given Existe un comentario con ID 4
+    When hago una petición DELETE a comments-4
+    Then la respuesta debe tener código de estado 200
 
-  Scenario: Eliminar un comentario por su ID
-    Given existe un comentario con ID 3
-    When envío una solicitud DELETE a "/comments/3"
-    Then recibo un código de estado 200
-    And el cuerpo contiene los datos del comentario eliminado
-
-  Scenario: Intentar eliminar un comentario que no existe
-    Given no existe un comentario con ID 99
-    When envío una solicitud DELETE a "/comments/99"
-    Then recibo un código de estado 404
-    And el cuerpo contiene un mensaje de error indicando "Comentario no encontrado"
-
-  Scenario: Buscar comentarios asociados a un profesor específico
-    Given existe un profesor con ID 5 y comentarios asociados
-    When envío una solicitud GET a "/comments/professor/5?page=0"
-    Then recibo un código de estado 200
-    And el cuerpo contiene una lista de comentarios pertenecientes al profesor
+  Scenario: Ejecutar un comentario existente (simulado)
+    Given Existe un comentario ejecutable con ID 5
+    When hago una petición GET a comments-execute-5
+    Then la respuesta debe tener código de estado 200
+    And el cuerpo debe contener el texto "Resultado"

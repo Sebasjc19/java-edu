@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public record CommentResponse(
+        Long id,
         @NotBlank
         String content,
         LocalDate creationDate,
