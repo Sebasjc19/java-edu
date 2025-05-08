@@ -8,10 +8,10 @@ Feature: Gestión de Programas
     And el cuerpo debe contener el ID del programa
 
   Scenario: Obtener todos los programas de un usuario
-    Given El usuario con ID 2 tiene programas asignados
-    When hago una petición GET a programs-2 con un usuario con rol "TUTOR"
+    Given existe un tutor con programas asignados
+    When consulto los programas del tutor autenticado
     Then la respuesta debe tener código de estado 200
-    And el cuerpo debe ser una lista
+    And el cuerpo debe contener una lista de programas
 
   Scenario: Crear un nuevo programa
     Given Tengo los datos válidos para crear un programa
@@ -20,8 +20,8 @@ Feature: Gestión de Programas
     And el cuerpo debe contener el nombre del programa "Ingeniería de Software"
 
   Scenario: Actualizar un programa existente
-    Given Existe un programa con ID 3 y datos nuevos válidos
-    When hago una petición PUT a programs-3
+    Given Existe un programa con ID 1 y datos nuevos validos
+    When hago una peticion PUT a programs-3
     Then la respuesta debe tener código de estado 200
     And el cuerpo debe reflejar los datos actualizados
 
