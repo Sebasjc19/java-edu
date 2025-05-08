@@ -1,22 +1,45 @@
 <configuration>
-    <!-- Auditoría: se guarda en archivo -->
-    <appender name="AUDIT_FILE" class="ch.qos.logback.core.FileAppender">
-        <file>logs/audit.log</file>
-        <append>true</append>
+
+    <!-- Appender general a consola (en JSON) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <!-- Appender TCP para Logstash (en JSON) -->
+    <appender name="TCP" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <!-- Auditoría: guarda en archivo con rotación semanal -->
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Auditoría: guarda en archivo con rotación semanal -->
+            <fileNamePattern>logs/audit.%d{yyyy-ww}.log</fileNamePattern>
+            <maxHistory>5</maxHistory>
+        </rollingPolicy>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- Logger específico para "AUDIT" -->
+    <!-- Auditoría: también a consola en JSON -->
+    <appender name="AUDIT_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <!-- Logger específico para AUDIT -->
     <logger name="AUDIT" level="INFO" additivity="false">
         <appender-ref ref="AUDIT_FILE" />
+        <appender-ref ref="AUDIT_STDOUT" />
+        <appender-ref ref="TCP" />
     </logger>
 
-    <!-- Appender consola (opcional, para logs generales) -->
-
-    <!-- Root logger (todo lo demás) -->
+    <!-- Root logger para logs generales -->
     <root level="INFO">
+        <appender-ref ref="AUDIT_FILE" />
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="TCP" />
     </root>
+
 </configuration>

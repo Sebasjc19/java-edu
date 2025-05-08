@@ -82,7 +82,7 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendNotification(NotificationCreationRequest request) {
         Optional<User> useOptional = userRepository.findByIdOptional(request.studentId());
         if(useOptional.isEmpty()){
-            throw new ResourceNotFoundException("No se encuentra un estudiante");
+            throw new ResourceNotFoundException("No se encuentra un usuario");
         }
         User user = useOptional.get();
         NotificationDTO notificationDTO = new NotificationDTO(user.getEmail(),"Creacion de cuenta",request.message(), request.studentId());

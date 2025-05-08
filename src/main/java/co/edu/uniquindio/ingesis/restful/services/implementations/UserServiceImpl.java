@@ -129,10 +129,17 @@ public class UserServiceImpl implements UserService {
             throw new InactiveUserException("El usuario esta inactivo");
         }
 
+
         User user = optionalUser.get();
-        user.setUsername(String.valueOf(request.username()));
-        user.setEmail(String.valueOf(request.email()));
-        user.setPassword(String.valueOf(request.password()));
+        if (request.username().isPresent()) {
+            user.setUsername(request.username().get());
+        }
+        if (request.email().isPresent()) {
+            user.setEmail(request.email().get());
+        }
+        if (request.password().isPresent()) {
+            user.setPassword(request.password().get());
+        }
 
         user.persist();
 
