@@ -15,7 +15,7 @@ services:
 #    image: my-quarkus-app:latest
 #    build:
 #      context: .
-#      dockerfile: src/main/docker/Dockerfile.runner.native-micro
+#      dockerfile: src/main/docker/Dockerfile.native-micro
 #    environment:
 #      QUARKUS_DATASOURCE_DB_KIND: postgresql
 #      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/mydatabase
@@ -59,16 +59,44 @@ services:
     networks:
       - monitoring
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    hostname: rabbit
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+  ####################################
+  # ELK Stack
+  ####################################
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    networks:
+      - monitoring
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.12.0
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - "5044:5044"
+      - "5000:5000"
+    networks:
+      - monitoring
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - monitoring
+    depends_on:
+      - elasticsearch
 
 
 
@@ -78,3 +106,6 @@ networks:
 volumes:
   postgres_data:
   grafana-data:
+  elastic_data:
+
+
