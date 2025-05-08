@@ -3,6 +3,7 @@ package co.edu.uniquindio.ingesis.restful.steps;
 import co.edu.uniquindio.ingesis.restful.domain.Role;
 import co.edu.uniquindio.ingesis.restful.domain.Type;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramCreationRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.LoginRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import io.cucumber.java.en.*;
@@ -26,6 +27,7 @@ public class ProgramStepDefinitions {
     private Long lastProgramId;
     Long tutorId;
     String tutorToken;
+    private UpdateProgramRequest updateRequest;
 
     @Given("Tengo los datos válidos para crear un programa")
     public void tengoLosDatosVálidosParaCrearUnPrograma() {
@@ -50,8 +52,8 @@ public class ProgramStepDefinitions {
         programId = response.jsonPath().getLong("id");  // <-- ID del programa
     }
 
-    @Then("la respuesta debe tener código de estado {int}")
-    public void laRespuestaDebeTenerCódigoDeEstado(int statusCode) {
+    @Then("la respuesta debe tener codigo de estado {int}")
+    public void laRespuestaDebeTenerCodigoDeEstado(int statusCode) {
         response.then().statusCode(statusCode);
     }
 
@@ -72,9 +74,14 @@ public class ProgramStepDefinitions {
     public void creoUnProgramaVálido() {
 
         programCreationRequest = new ProgramCreationRequest(
-                "Ingeniería de Prueba",
+                "Ingenieria de Prueba",
                 "Un programa para pruebas",
-                "System.out.println('Prueba');",
+                "public class Main {\n" +
+                        "    public static void main(String[] args) {\n" +
+                        " \n" +
+                        "        System.out.println(\"¡Hola, Mundo!\");\n" +
+                        "    }\n" +
+                        "}",
                 Type.NORMAL,
                 userSteps.getUserId() // Usa el ID del usuario
         );
@@ -186,5 +193,84 @@ public class ProgramStepDefinitions {
     public void elCuerpoDebeContenerUnaListaDeProgramas() {
         response.then()
                 .body("$", not(empty())); // Verifica que la respuesta sea una lista no vacía
+    }
+
+    // ----------------------------------------------------
+
+    @Given("Existe un programa y datos nuevos validos")
+    public void existeUnProgramaYDatosNuevosValidos() {
+        existeUnTutorConProgramasAsignados(); // Se reutiliza para crear el usuario y el programa asignado a este
+
+        // Datos nuevos para actualizar
+        updateRequest = new UpdateProgramRequest(
+                "Nombre actualizado",
+                "Descripción actualizada",
+                "System.out.println('Actualizado');",
+                1L
+        );
+    }
+
+    @When("hago una peticion PUT a {string}")
+    public void hagoUnaPeticionPUTA(String ruta) {
+        response = given()
+                .baseUri("http://localhost:8080")
+                .contentType("application/json")
+                .auth().oauth2(tutorToken)
+                .body(updateRequest)
+                .when()
+                .put(ruta);
+    }
+
+    @And("el cuerpo debe reflejar los datos actualizados")
+    public void elCuerpoDebeReflejarLosDatosActualizados() {
+        response.then()
+                .body("title", equalTo(updateRequest.title()))
+                .body("description", equalTo(updateRequest.description()))
+                .body("code", equalTo(updateRequest.code()))
+                .body("userId", equalTo(updateRequest.userId().intValue()));
+    }
+
+    // ----------------------------------------------------
+
+    @Given("Existe un programa con ID {int}")
+    public void existeUnProgramaConID(int programID) {
+        existeUnUsuarioConRolAutenticado("TUTOR");
+
+        Response getResponse = given()
+                .baseUri("http://localhost:8080")
+                .auth().oauth2(userSteps.getJwtToken())  // Aquí añades el token
+                .when()
+                .get("/programs/" + programID);
+
+        if (getResponse.statusCode() == 404) {
+            creoUnProgramaVálido();
+        }
+    }
+
+
+    @When("hago una petición DELETE a {string}")
+    public void hagoUnaPeticiónDELETEA(String url) {
+        response = given()
+                .baseUri("http://localhost:8080")
+                .auth().oauth2(userSteps.getJwtToken())
+                .when()
+                .delete(url);
+    }
+
+    // ----------------------------------------------------
+
+    @When("hago una petición GET a {string}")
+    public void hagoUnaPeticiónGETA(String url) {
+        // Realizamos la petición GET para ejecutar el programa
+        response = given()
+                .baseUri("http://localhost:8080")
+                .auth().oauth2(userSteps.getJwtToken())
+                .when()
+                .get(url);
+    }
+
+    @And("el cuerpo debe contener el texto {string}")
+    public void elCuerpoDebeContenerElTexto(String textCode) {
+        response.then().body(containsString(textCode));
     }
 }
