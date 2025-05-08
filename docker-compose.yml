@@ -107,3 +107,5 @@ volumes:
   postgres_data:
   grafana-data:
   elastic_data:
+
+
