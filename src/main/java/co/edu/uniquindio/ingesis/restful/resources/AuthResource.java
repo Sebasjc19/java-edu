@@ -20,7 +20,7 @@ public class AuthResource {
 
     @Inject AuthService authService;
 
-    @GET
+    @POST
     @PermitAll
     public Response login(@Valid LoginRequest credentials) {
         try {
