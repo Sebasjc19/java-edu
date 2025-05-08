@@ -68,7 +68,7 @@ public class UserResources {
     @PATCH
     @Path("/{id}")
     @RolesAllowed({"STUDENT", "TUTOR"})
-    public Response updateUserById(@PathParam("id") Long id, @Valid UserUpdateRequest request) {
+    public Response updateUserById(@PathParam("id") Long id, UserUpdateRequest request) {
         UserResponse userResponse = userService.updateUserById(id, request);
         return Response.ok(new MessageDTO<>(false, userResponse)).build();
     }

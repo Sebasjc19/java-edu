@@ -46,10 +46,14 @@ nb-configuration.xml
 
 #BD LOCAL
 database/docker-compose.yml
+db/docker-compose.yml
 
 # Ignorar llaves privadas
-src/main/resources/private_key.pem
-src/main/resources/META-INF/resources/public_key.pem
+src/main/resources/privateKey.pem
+src/main/resources/META-INF/resources/publicKey.pem
 
 # Ignorar logs
 logs
+
+# ignorar la bd
+bd

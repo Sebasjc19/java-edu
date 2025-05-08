@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record NotificationCreationRequest(
-        @Size(min = 3, max = 20)
+        @Size(min = 3, max = 50)
         String message,
         @NotNull
         Long studentId

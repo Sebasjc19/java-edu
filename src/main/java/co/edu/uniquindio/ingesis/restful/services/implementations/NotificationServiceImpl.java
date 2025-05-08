@@ -4,9 +4,11 @@ import co.edu.uniquindio.ingesis.restful.domain.Comment;
 import co.edu.uniquindio.ingesis.restful.domain.Notification;
 import co.edu.uniquindio.ingesis.restful.domain.User;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationCreationRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationResponse;
 import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.NotificationMapper;
+import co.edu.uniquindio.ingesis.restful.producers.NotificationProducer;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.NotificationRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.NotificationService;
@@ -14,6 +16,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.jose4j.jwk.Use;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -31,7 +35,10 @@ public class NotificationServiceImpl implements NotificationService {
     NotificationRepository notificationRepository;
     @Inject
     UserRepository userRepository;
+    @Inject
+    NotificationProducer notificationProducer;
 
+    private static final Logger auditLogger = LoggerFactory.getLogger("audit");
 
     @Override
     public List<NotificationResponse> findNotificationsByStudentId(Long studentId, int page) {
@@ -48,6 +55,9 @@ public class NotificationServiceImpl implements NotificationService {
 
         List<Notification> paginatedNotifications = notifications.subList(fromIndex, toIndex);
 
+        auditLogger.info("Consulta de notificaciones: studentId='{}', page='{}', resultados='{}'",
+                studentId, page, paginatedNotifications.size());
+
         // Convertir la lista de entidades en una lista de respuestas DTO
         return paginatedNotifications.stream()
                 .map(notificationMapper::toNotificationResponse)
@@ -61,21 +71,32 @@ public class NotificationServiceImpl implements NotificationService {
             throw  new ResourceNotFoundException("Notificacion no encontrada");
         }
         Notification notification = optionalNotification.get();
+
+        auditLogger.info("Consulta de notificación por ID: id='{}'",
+                id);
+
         return notificationMapper.toNotificationResponse(notification);
     }
 
     @Override
-    public NotificationResponse createNotification(NotificationCreationRequest request) {
+    public void sendNotification(NotificationCreationRequest request) {
         Optional<User> useOptional = userRepository.findByIdOptional(request.studentId());
         if(useOptional.isEmpty()){
-            throw new ResourceNotFoundException("No se encuentra un estudiante");
+            throw new ResourceNotFoundException("No se encuentra un usuario");
         }
-        Notification notification = notificationMapper.parseOf(request);
-        notification.setSentDate(LocalDate.now());
-        notification.setRead(false);
-        notification.persist();
+        User user = useOptional.get();
+        NotificationDTO notificationDTO = new NotificationDTO(user.getEmail(),"Creacion de cuenta",request.message(), request.studentId());
+        notificationProducer.sendNotificacion(notificationDTO);
 
-        return notificationMapper.toNotificationResponse(notification);
+        //Notification notification = notificationMapper.parseOf(request);
+        //notification.setSentDate(LocalDate.now());
+        //notification.setRead(false);
+        //notification.persist();
+
+        //auditLogger.info("Notificación creada: destinatarioId='{}', fecha='{}'"
+        //        , request.studentId(), notification.getSentDate());
+
+        //return notificationMapper.toNotificationResponse(notification);
     }
 
     @Override
@@ -89,6 +110,9 @@ public class NotificationServiceImpl implements NotificationService {
         // Obtener la notificación y eliminarlo
         Notification notification = optionalNotification.get();
         notification.delete();
+
+        auditLogger.info("Notificación eliminada: id='{}'",
+                id);
 
         return notificationMapper.toNotificationResponse(notification);
     }
