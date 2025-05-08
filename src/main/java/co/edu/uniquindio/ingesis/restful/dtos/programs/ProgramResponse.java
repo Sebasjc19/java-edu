@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public record ProgramResponse(
+        Long id,
         @NotNull
         @NotBlank
         String title,

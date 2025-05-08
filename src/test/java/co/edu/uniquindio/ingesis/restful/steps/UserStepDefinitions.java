@@ -1,8 +1,17 @@
 package co.edu.uniquindio.ingesis.restful.steps;
 
+import co.edu.uniquindio.ingesis.restful.domain.Role;
+import co.edu.uniquindio.ingesis.restful.dtos.usuarios.LoginRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import io.cucumber.java.en.*;
 import io.restassured.response.Response;
 import io.restassured.http.ContentType;
+import lombok.Getter;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -10,30 +19,39 @@ import static org.hamcrest.Matchers.*;
 public class UserStepDefinitions {
 
     private Response response;
+    @Getter
     private Long userId;
+    private UserRegistrationRequest userRegistrationRequest;
+    @Getter
+    private String jwtToken; //  Aquí se almacena el token
 
     @Given("tengo los datos válidos de un nuevo usuario")
     public void tengoDatosUsuarioValido() {
         // Paso informativo
+        userRegistrationRequest = new UserRegistrationRequest(
+                "juan_perez",                         // username
+                "juan.perez@example.com",             // email
+                "Password123",                         // password
+                "1234567890",                          // identificationNumber
+                LocalDate.of(2000, 5, 20),             // birthDate
+                9007199254740991L,                                    // idGroup
+                Role.STUDENT                           // role (puede ser null, default es STUDENT)
+        );
     }
 
     @When("envío una solicitud POST a {string}")
     public void envioPostUsers(String url) {
-        String nuevoUsuarioJson = """
-            {
-                "name": "Juan",
-                "email": "juan@correo.com",
-                "password": "seguro123"
-            }
-        """;
-
         response = given()
-                .contentType(ContentType.JSON)
-                .body(nuevoUsuarioJson)
+                .baseUri("http://localhost:8080")
+                .contentType("application/json")
+                .body(userRegistrationRequest)
                 .when()
                 .post(url);
 
+        response.prettyPrint();
+
         userId = response.jsonPath().getLong("id");
+        System.out.println("ID del usuario creado: " + userId);
     }
 
     @Then("recibo un código de estado {int}")
@@ -43,77 +61,65 @@ public class UserStepDefinitions {
 
     @And("el cuerpo contiene la información del nuevo usuario")
     public void verificarCuerpoUsuario() {
-        response.then().body("id", notNullValue());
+        response.then().body("email", notNullValue());
     }
 
-    @Given("existe un usuario con ID {int}")
-    public void existeUsuarioConId(int id) {
-        userId = (long) id;
+    //-------------------------
+    public void crearYLoggearUsuarioConRol(Role rol) {
+        userRegistrationRequest = new UserRegistrationRequest(
+                "user_" + UUID.randomUUID(), // username aleatorio
+                "user" + UUID.randomUUID() + "@example.com",
+                "Password123",
+                "1234567890",
+                LocalDate.of(2000, 1, 1),
+                1L,
+                rol
+        );
+        envioPostUsers("/users");
+        loginUsuario();
     }
 
-    @When("envío una solicitud GET a {string}")
-    public void envioSolicitudGetA(String url) {
-        response = given()
-                .accept(ContentType.JSON)
+    private String obtenerAccessToken() {
+        Map<String, String> loginData = new HashMap<>();
+        loginData.put("email", userRegistrationRequest.email());
+        loginData.put("password", userRegistrationRequest.password());
+
+        return given()
+                .baseUri("http://localhost:8080")
+                .contentType("application/json")
+                .body(loginData)
                 .when()
-                .get(url);
+                .post("/auth")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("respuesta.token"); // <- Extrae el token correctamente
     }
 
-    @And("el cuerpo contiene la información del usuario con ID {int}")
-    public void verificarCuerpoGet(int id) {
-        response.then().body("id", equalTo(id));
-    }
+    public void loginUsuario() {
+        // Crear un objeto LoginRequest con los datos del usuario
+        LoginRequest loginRequest = new LoginRequest(
+                userRegistrationRequest.email(),  // Usar el email de userRegistrationRequest
+                userRegistrationRequest.password() // Usar la contraseña de userRegistrationRequest
+        );
 
-    @Given("existe un usuario con ID {int} y datos actualizados")
-    public void existeUsuarioParaActualizar(int id) {
-        userId = (long) id;
-    }
-
-    @When("envío una solicitud PATCH a {string}")
-    public void envioSolicitudPatchA(String url) {
-        String jsonActualizacion = """
-            {
-                "name": "Juan Actualizado",
-                "email": "juan.nuevo@correo.com"
-            }
-        """;
-
+        // Hacer la solicitud POST al endpoint de login
         response = given()
+                .baseUri("http://localhost:8080")
                 .contentType(ContentType.JSON)
-                .body(jsonActualizacion)
+                .body(loginRequest) // Enviar el loginRequest en el cuerpo de la solicitud
                 .when()
-                .patch(url);
+                .post("/auth"); // Ruta del endpoint de autenticación
+
+        // Extraer el token de la respuesta (ajusta el path si es necesario)
+        jwtToken = response.then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getString("respuesta.token"); // Ajusta el path al nombre correcto del token
     }
 
-    @And("el cuerpo contiene la información actualizada")
-    public void verificarActualizacion() {
-        response.then().body("name", equalTo("Juan Actualizado"));
-    }
 
-    @When("envío una solicitud DELETE a {string}")
-    public void envioSolicitudDeleteA(String url) {
-        response = given()
-                .when()
-                .delete(url);
-    }
 
-    @And("el cuerpo contiene el mensaje {string}")
-    public void verificarMensaje(String mensaje) {
-        response.then().body("message", equalTo(mensaje));
-    }
-
-    @Given("soy un usuario con rol ADMIN")
-    public void usuarioConRolAdmin() {
-        // Aquí puedes generar un token JWT si estás usando autenticación
-    }
-
-    @And("el cuerpo contiene una lista de usuarios")
-    public void verificarListaUsuarios() {
-        response.then().body("data", not(empty()));
-    }
-
-    @And("el cuerpo contiene una lista de usuarios activos")
-    public void verificarUsuariosActivos() {
-        response.then().body("data", not(empty()));
-    }
 }

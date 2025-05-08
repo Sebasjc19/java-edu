@@ -155,14 +155,6 @@
             <version>5.5.1</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- Para integración con JSON -->
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>json-path</artifactId>
-            <version>5.5.1</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
