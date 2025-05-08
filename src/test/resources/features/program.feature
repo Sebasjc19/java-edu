@@ -1,10 +1,11 @@
 Feature: Gestión de Programas
 
   Scenario: Obtener un programa por ID
-    Given Existe un programa con ID 1
-    When hago una petición GET a programs-1 con un usuario con rol "STUDENT"
+    Given existe un usuario con rol "STUDENT" autenticado
+    And creo un programa válido
+    When hago una petición GET al programa recién creado
     Then la respuesta debe tener código de estado 200
-    And el cuerpo debe contener el ID 1
+    And el cuerpo debe contener el ID del programa
 
   Scenario: Obtener todos los programas de un usuario
     Given El usuario con ID 2 tiene programas asignados

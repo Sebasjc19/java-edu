@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 public record UserResponse(
+        Long id,
         String username,
         String email,
         String identificationNumber,
