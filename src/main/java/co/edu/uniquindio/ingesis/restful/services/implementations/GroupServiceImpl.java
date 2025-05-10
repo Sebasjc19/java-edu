@@ -7,7 +7,10 @@ import co.edu.uniquindio.ingesis.restful.dtos.groups.AddStudentToGroupRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.UpdateGroupRequest;
+import co.edu.uniquindio.ingesis.restful.exceptions.groups.implementations.IdNotCreatedException;
+import co.edu.uniquindio.ingesis.restful.exceptions.groups.implementations.StudentNotInGroupException;
 import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
+import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.RoleNotAllowedException;
 import co.edu.uniquindio.ingesis.restful.mappers.GroupMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.GroupRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
@@ -38,14 +41,14 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse findGroupByProfessorId(Long professorId) {
         User tutor = User.findById(professorId);
         if(tutor == null){
-            throw new ResourceNotFoundException("Professor not found");
+            throw new ResourceNotFoundException("El usuario con rol de profesor no existe");
         }
         if(tutor.getRole() != Role.TUTOR){
-            throw new ResourceNotFoundException("Professor not found");
+            throw new RoleNotAllowedException("Este rol no tiene permitida esa accion");
         }
         Optional<Group> group = groupRepository.findByProfessorId(professorId);
         if (group.isEmpty()) {
-            throw new ResourceNotFoundException("Group not found");
+            throw new ResourceNotFoundException("EL grupo no existe");
         }
         Group groupEntity = group.get();
         auditLogger.info("Consulta de grupos por profesor: professorId='{}', total='{}'",
@@ -58,7 +61,7 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse getGroupById(Long id) {
         Group group = Group.findById(id);
         if( group == null ){
-            throw new ResourceNotFoundException("Grupo no encontrado");
+            throw new ResourceNotFoundException("El grupo no existe");
         }
 
         auditLogger.info("Consulta de grupo por ID: groupId='{}'",
@@ -72,10 +75,10 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse createGroup(GroupCreationRequest request) {
         User tutor = User.findById(request.idProfessor());
         if(tutor==null){
-            throw new ResourceNotFoundException("Professor no encontrado");
+            throw new ResourceNotFoundException("El usuario con rol de profesor no existe");
         }
         if(tutor.getRole() != Role.TUTOR){
-            throw new ResourceNotFoundException("Rol incorrecto");
+            throw new RoleNotAllowedException("El profesor asignado no tiene un rol valido");
         }
         Group group = groupMapper.parseOf(request);
         group.persist();
@@ -83,7 +86,7 @@ public class GroupServiceImpl implements GroupService {
             tutor.setGroupId(group.id);
             tutor.persist();
         }else {
-            throw new ResourceNotFoundException("Id no generado");
+            throw new IdNotCreatedException("El Id del grupo no fue generado");
         }
 
         auditLogger.info("Grupo creado: nombre='{}', profesorId='{}'",
@@ -97,14 +100,14 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse updateGroupById(Long id, UpdateGroupRequest request) {
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(id);
         if (optionalGroup.isEmpty()) {
-            throw new ResourceNotFoundException("Grupo no encontrado");
+            throw new ResourceNotFoundException("El grupo no existe");
         }
         User tutor = User.findById(request.idProfessor());
         if (tutor == null) {
-            throw new ResourceNotFoundException("Professor no encontrado");
+            throw new ResourceNotFoundException("El profesor asignado no existe");
         }
         if(tutor.getRole() != Role.TUTOR){
-            throw new ResourceNotFoundException("Rol incorrecto");
+            throw new RoleNotAllowedException("El profesor asignado no tiene un rol valido");
         }
 
         Group group = optionalGroup.get();
@@ -125,7 +128,7 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse deleteGroup(Long id) {
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(id);
         if (optionalGroup.isEmpty()) {
-            throw new ResourceNotFoundException("Grupo no encontrado");
+            throw new ResourceNotFoundException("EL grupo no existe");
         }
 
         Group group = optionalGroup.get();
@@ -134,7 +137,7 @@ public class GroupServiceImpl implements GroupService {
             tutor.setGroupId(null);
             tutor.persist();
         }else {
-            throw new ResourceNotFoundException("Tutor no encontrado");
+            throw new ResourceNotFoundException("El profesor asignado ya no existe");
         }
         for(Long student: group.getStudentsIds()){
             User studentUser = User.findById(student);
@@ -142,7 +145,7 @@ public class GroupServiceImpl implements GroupService {
                 studentUser.setGroupId(null);
                 studentUser.persist();
             }else {
-                throw new ResourceNotFoundException("Student no encontrado");
+                throw new ResourceNotFoundException("El estudiante miembro ya no existe");
             }
         }
         group.delete();
@@ -158,11 +161,11 @@ public class GroupServiceImpl implements GroupService {
     public void addStudentToGroup(Long groupId, AddStudentToGroupRequest request) {
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(groupId);
         if (optionalGroup.isEmpty()) {
-            throw new ResourceNotFoundException("Grupo no encontrado");
+            throw new ResourceNotFoundException("EL grupo no existe");
         }
         User studentUser = User.findById(request.studentId());
         if (studentUser == null) {
-            throw new ResourceNotFoundException("Student no encontrado");
+            throw new ResourceNotFoundException("El estudiante a añadir no existe");
         }
         Group group = optionalGroup.get();
         group.getStudentsIds().add(studentUser.id);
@@ -174,15 +177,15 @@ public class GroupServiceImpl implements GroupService {
     public void removeStudentFromGroup(Long groupId, Long studentId) {
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(groupId);
         if (optionalGroup.isEmpty()) {
-            throw new ResourceNotFoundException("Grupo no encontrado");
+            throw new ResourceNotFoundException("EL grupo no existe");
         }
         User studentUser = User.findById(studentId);
         if (studentUser == null) {
-            throw new ResourceNotFoundException("Student no encontrado");
+            throw new ResourceNotFoundException("El estudiante miembro ya no existe");
         }
         Group group = optionalGroup.get();
         if(!group.getStudentsIds().contains(studentUser.id)){
-            throw new ResourceNotFoundException("Student no encontrado");
+            throw new StudentNotInGroupException("El estudiante a eliminar no hace parte del grupo");
         }
         group.getStudentsIds().remove(studentUser.id);
         studentUser.setGroupId(null);
