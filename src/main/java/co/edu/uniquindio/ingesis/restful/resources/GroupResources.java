@@ -55,7 +55,7 @@ public class GroupResources {
     @RolesAllowed({"TUTOR"})
     public Response createGroup(@Valid GroupCreationRequest request) {
         GroupResponse groupResponse = groupService.createGroup(request);
-        return Response.status(Response.Status.CREATED).entity(groupResponse).build();
+        return Response.ok(new MessageDTO<>(false, groupResponse)).build();
     }
 
     /**
