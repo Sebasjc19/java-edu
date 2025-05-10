@@ -18,6 +18,5 @@ public record UserResponse(
         LocalDate birthDate,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate registrationDate,
-        Role role,
-        Long idGroup) {
+        Role role) {
 }

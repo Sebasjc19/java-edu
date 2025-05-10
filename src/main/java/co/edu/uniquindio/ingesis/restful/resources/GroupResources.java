@@ -2,6 +2,7 @@ package co.edu.uniquindio.ingesis.restful.resources;
 
 import co.edu.uniquindio.ingesis.restful.dtos.MessageDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentResponse;
+import co.edu.uniquindio.ingesis.restful.dtos.groups.AddStudentToGroupRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.GroupResponse;
 import co.edu.uniquindio.ingesis.restful.dtos.groups.UpdateGroupRequest;
@@ -29,10 +30,10 @@ public class GroupResources {
      * Obtener todos los grupos de un profesor específico.
      */
     @GET
-    @Path("/{professorId}")
+    @Path("/professor/{professorId}")
     @RolesAllowed({"TUTOR"})
-    public Response findGroupsByProfessorId(@PathParam("professorId") Long professorId) {
-        List<GroupResponse> groupResponse = groupService.findGroupsByProfessorId(professorId);
+    public Response findGroupByProfessorId(@PathParam("professorId") Long professorId) {
+        GroupResponse groupResponse = groupService.findGroupByProfessorId(professorId);
         return Response.ok(new MessageDTO<>(false, groupResponse)).build();
     }
 
@@ -78,4 +79,22 @@ public class GroupResources {
         GroupResponse groupResponse = groupService.deleteGroup(id);
         return Response.ok(new MessageDTO<>(false, groupResponse)).build();
     }
+
+    @POST
+    @Path("/add/{id}")
+    @RolesAllowed({"TUTOR", "ADMIN"})
+    public Response addStudentToGroup(@PathParam("id") Long groupId, @Valid AddStudentToGroupRequest request){
+        groupService.addStudentToGroup(groupId, request);
+        return Response.ok(new MessageDTO<>(false, "Estudiante agregado al grupo de id: " + groupId)).build();
+    }
+
+    @DELETE
+    @Path("/{groupId}/students/{studentId}")
+    @RolesAllowed({"TUTOR", "ADMIN"})
+    public Response removeStudentFromGroup(@PathParam("groupId") Long groupId, @PathParam("studentId") Long studentId) {
+        groupService.removeStudentFromGroup(groupId, studentId);
+        return Response.ok(new MessageDTO<>(false, "Estudiante de id: " +studentId +"eliminado del grupo de  id: "+groupId)).build();
+    }
+
+
 }
