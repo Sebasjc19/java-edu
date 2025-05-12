@@ -8,12 +8,12 @@ import co.edu.uniquindio.ingesis.restful.services.implementations.JavaExecutionS
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ProgramService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,8 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProgramResources {
 
+    @Inject
     ProgramService programService;
-    JavaExecutionServiceImpl executeProgramService;
 
     /**
      * Obtener todos los programas asociados a un usuario.
@@ -81,19 +81,11 @@ public class ProgramResources {
         return Response.ok(programResponse).build();
     }
 
-    @POST
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response ejecutarPrograma(String codigo) {
-        try {
-            String resultado = executeProgramService.ejecutarCodigo(codigo);
-            return Response.ok(resultado).build();
-        } catch (SecurityException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Código no permitido: " + e.getMessage()).build();
-        } catch (IOException | InterruptedException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al ejecutar: " + e.getMessage()).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error inesperado: " + e.getMessage()).build();
-        }
+    @GET
+    @Path("/execute/{id}")
+    @PermitAll
+    public Response ejecutarPrograma(@PathParam("id") String id) throws InterruptedException {
+        System.out.println("hola");
+        return Response.ok(programService.executeProgram(Long.valueOf(id))).build();
     }
 }
