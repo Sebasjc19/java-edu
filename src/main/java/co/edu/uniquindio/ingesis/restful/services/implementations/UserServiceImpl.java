@@ -33,8 +33,7 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     @Inject
     UserRepository userRepository;
-    @Inject
-    SendEmailServiceImpl sendEmailService;
+
 
     private static final Logger auditLogger = LoggerFactory.getLogger("audit");
 

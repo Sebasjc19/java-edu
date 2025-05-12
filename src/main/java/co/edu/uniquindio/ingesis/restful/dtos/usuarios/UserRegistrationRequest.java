@@ -21,7 +21,6 @@ public record UserRegistrationRequest(
         @Size (min = 8,message = "La longitud mínima es 8")
         String password,
 
-        @NotNull
         @NotBlank
         String identificationNumber,
 
