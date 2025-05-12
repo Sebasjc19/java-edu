@@ -1,4 +1,4 @@
-package co.edu.uniquindio.ingesis.restful.services;
+package co.edu.uniquindio.ingesis.restful;
 
 import co.edu.uniquindio.ingesis.restful.domain.Notification;
 import co.edu.uniquindio.ingesis.restful.domain.User;
