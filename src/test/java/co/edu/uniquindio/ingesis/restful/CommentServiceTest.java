@@ -1,4 +1,4 @@
-package co.edu.uniquindio.ingesis.restful.services;
+package co.edu.uniquindio.ingesis.restful;
 
 import co.edu.uniquindio.ingesis.restful.domain.Comment;
 import co.edu.uniquindio.ingesis.restful.domain.Program;
@@ -12,7 +12,6 @@ import co.edu.uniquindio.ingesis.restful.repositories.interfaces.CommentReposito
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ProgramRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.implementations.CommentServiceImpl;
-import io.quarkus.panache.common.Page;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
