@@ -113,8 +113,7 @@ public class CommentStepsDefinitions {
                 "Salem2004",
                 "1234567890",
                 LocalDate.of(2000, 5, 20),
-                1L,
-                Role.TUTOR
+                                Role.TUTOR
         );
 
         Response crearUsuarioResponse = given()

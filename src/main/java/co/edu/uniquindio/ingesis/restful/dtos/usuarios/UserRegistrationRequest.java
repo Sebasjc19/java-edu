@@ -29,8 +29,6 @@ public record UserRegistrationRequest(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate birthDate,
 
-        Long idGroup,
-
         Role role) {
 
     public UserRegistrationRequest {

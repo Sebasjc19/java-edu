@@ -61,6 +61,9 @@ services:
     networks:
       - monitoring
 
+  ####################################
+  # ELK Stack
+  ####################################
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
     environment:
@@ -69,10 +72,10 @@ services:
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ports:
       - "9200:9200"
-    volumes:
-      - elastic_data:/usr/share/elasticsearch/data
     networks:
       - monitoring
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.12.0
@@ -81,10 +84,10 @@ services:
     ports:
       - "5044:5044"
       - "5000:5000"
-    depends_on:
-      - elasticsearch
     networks:
       - monitoring
+    depends_on:
+      - elasticsearch
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.12.0
@@ -94,6 +97,20 @@ services:
       - "5601:5601"
     depends_on:
       - elasticsearch
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+
+networks:
+  monitoring:
     networks:
       - monitoring
 
@@ -101,8 +118,5 @@ volumes:
   postgres_data:
   grafana-data:
   elastic_data:
-
-
-
 
 

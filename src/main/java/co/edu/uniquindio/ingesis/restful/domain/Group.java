@@ -7,6 +7,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -14,6 +18,12 @@ import lombok.Setter;
 public class Group extends PanacheEntity {
     @Size(min = 3, max = 20)
     private String name;
-    @NotNull
-    private String idProfessor;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "group_student_ids",
+            joinColumns = @JoinColumn(name = "group_id"))
+    @Column(name = "student_user_id")
+    private Set<Long> studentsIds = new HashSet<>();
+
+    private Long tutorId;
 }

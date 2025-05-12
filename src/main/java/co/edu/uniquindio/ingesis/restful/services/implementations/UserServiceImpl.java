@@ -130,15 +130,10 @@ public class UserServiceImpl implements UserService {
 
 
         User user = optionalUser.get();
-        if (request.username().isPresent()) {
-            user.setUsername(request.username().get());
-        }
-        if (request.email().isPresent()) {
-            user.setEmail(request.email().get());
-        }
-        if (request.password().isPresent()) {
-            user.setPassword(request.password().get());
-        }
+        request.username().ifPresent(user::setUsername);
+        request.email().ifPresent(user::setEmail);
+        request.password().ifPresent(user::setPassword);
+
 
         user.persist();
 

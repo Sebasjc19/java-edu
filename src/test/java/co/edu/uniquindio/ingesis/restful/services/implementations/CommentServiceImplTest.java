@@ -1,4 +1,4 @@
-package co.edu.uniquindio.ingesis.restful;
+package co.edu.uniquindio.ingesis.restful.services.implementations;
 
 import co.edu.uniquindio.ingesis.restful.domain.Comment;
 import co.edu.uniquindio.ingesis.restful.domain.Program;
@@ -11,7 +11,6 @@ import co.edu.uniquindio.ingesis.restful.mappers.CommentMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.CommentRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ProgramRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
-import co.edu.uniquindio.ingesis.restful.services.implementations.CommentServiceImpl;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -27,7 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @QuarkusTest
-public class CommentServiceTest {
+public class CommentServiceImplTest {
 
     @Inject
     CommentServiceImpl commentService;

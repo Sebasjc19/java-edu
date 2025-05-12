@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -31,6 +33,7 @@ public class User extends PanacheEntity {
     @NotBlank(message = "El número de identificación no puede ser nulo")
     private String identificationNumber;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @NotNull(message = "La fecha no puede ser nula")
@@ -42,8 +45,8 @@ public class User extends PanacheEntity {
     private LocalDate registrationDate;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Role role;
 
-    @NotNull
-    private Long idGroup;
+    private Long groupId;
 }
