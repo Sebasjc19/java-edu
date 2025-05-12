@@ -171,21 +171,6 @@ public class UserStep {
 
     }
 
-// No existe el usuario
-        /*
-                 datosUsuarioValido = new UserRegistrationRequest(
-                "prueba1234",email,"Contrasenia123!",
-                "1234567", LocalDate.now(), 1L, Role.STUDENT
-        );
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(datosUsuarioValido)
-                .when()
-                .post("/users")
-                .then()
-                .statusCode(201);
-        */
 
     public void loginUsuario(String correo, String password) {
         // Crear un objeto LoginRequest con los datos del usuario
