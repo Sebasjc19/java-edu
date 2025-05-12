@@ -124,8 +124,7 @@ public class NotificationsStepsDefinitions {
                 "Password123",
                 "123456789",
                 LocalDate.of(1995, 1, 1),
-                1L,
-                rol
+                                rol
         );
 
         Response crearUsuarioResponse = given()
