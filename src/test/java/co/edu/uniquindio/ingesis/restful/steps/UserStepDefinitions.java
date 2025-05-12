@@ -34,7 +34,6 @@ public class UserStepDefinitions {
                 "Password123",                         // password
                 "1234567890",                          // identificationNumber
                 LocalDate.of(2000, 5, 20),             // birthDate
-                9007199254740991L,                                    // idGroup
                 Role.STUDENT                           // role (puede ser null, default es STUDENT)
         );
     }
@@ -72,7 +71,6 @@ public class UserStepDefinitions {
                 "Password123",
                 "1234567890",
                 LocalDate.of(2000, 1, 1),
-                1L,
                 rol
         );
         envioPostUsers("/users");
@@ -119,5 +117,7 @@ public class UserStepDefinitions {
                 .jsonPath()
                 .getString("respuesta.token"); // Ajusta el path al nombre correcto del token
     }
+
+
 
 }

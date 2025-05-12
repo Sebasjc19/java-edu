@@ -16,6 +16,7 @@
     <!-- Auditoría: guarda en archivo con rotación semanal -->
     <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Auditoría: guarda en archivo con rotación semanal -->
             <fileNamePattern>logs/audit.%d{yyyy-ww}.log</fileNamePattern>
             <maxHistory>5</maxHistory>
         </rollingPolicy>
