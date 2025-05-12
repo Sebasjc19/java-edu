@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.logging.Level;
 
 import static io.quarkus.elytron.security.common.BcryptUtil.matches;
 
@@ -56,10 +57,9 @@ public class AuthServiceImpl implements AuthService {
             auditLogger.info("Login exitoso para usuario '{}'", user.getEmail());
             // Registrar en el Log
             return new TokenDTO(token);
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new RuntimeException();
-            //Registrar en el log
+        } catch (Exception e) {
+            auditLogger.error("Error inesperado al procesar la operación", e);
+            throw new RuntimeException("Error inesperado al procesar la operación", e);
         }
     }
 }
