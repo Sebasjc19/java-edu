@@ -72,8 +72,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
         Notification notification = optionalNotification.get();
 
-        auditLogger.info("Consulta de notificación por ID: id='{}'",
-                id);
+        auditLogger.info("Consulta de notificación por ID", id);
 
         return notificationMapper.toNotificationResponse(notification);
     }

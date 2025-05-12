@@ -18,9 +18,7 @@ public class Comment extends PanacheEntity {
     private String content;
     private LocalDate creationDate;
     @NotNull
-    @NotBlank
     private Long professorId;
     @NotNull
-    @NotBlank
     private Long programId;
 }

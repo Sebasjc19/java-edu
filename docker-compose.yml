@@ -10,24 +10,26 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
-#  app:
-#    image: my-quarkus-app:latest
-#    build:
-#      context: .
-#      dockerfile: src/main/docker/Dockerfile.native-micro
-#    environment:
-#      QUARKUS_DATASOURCE_DB_KIND: postgresql
-#      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/mydatabase
-#      QUARKUS_DATASOURCE_USERNAME: myuser
-#      QUARKUS_DATASOURCE_PASSWORD: mypassword
-#      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: drop-and-create
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - postgres
-
-##############################
+  #  app:
+  #    image: my-quarkus-app:latest
+  #    build:
+  #      context: .
+  #      dockerfile: src/main/docker/Dockerfile.native-micro
+  #    environment:
+  #      QUARKUS_DATASOURCE_DB_KIND: postgresql
+  #      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/mydatabase
+  #      QUARKUS_DATASOURCE_USERNAME: myuser
+  #      QUARKUS_DATASOURCE_PASSWORD: mypassword
+  #      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: drop-and-create
+  #    ports:
+  #      - "8080:8080"
+  #    depends_on:
+  #      - postgres
+  #    networks:
+  #      - backend
 
   prometheus:
     image: prom/prometheus:latest
@@ -59,9 +61,6 @@ services:
     networks:
       - monitoring
 
-  ####################################
-  # ELK Stack
-  ####################################
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
     environment:
@@ -70,10 +69,10 @@ services:
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ports:
       - "9200:9200"
-    networks:
-      - monitoring
     volumes:
       - elastic_data:/usr/share/elasticsearch/data
+    networks:
+      - monitoring
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.12.0
@@ -82,10 +81,10 @@ services:
     ports:
       - "5044:5044"
       - "5000:5000"
-    networks:
-      - monitoring
     depends_on:
       - elasticsearch
+    networks:
+      - monitoring
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.12.0
@@ -93,19 +92,17 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
       - "5601:5601"
-    networks:
-      - monitoring
     depends_on:
       - elasticsearch
-
-
-
-networks:
-  monitoring:
+    networks:
+      - monitoring
 
 volumes:
   postgres_data:
   grafana-data:
   elastic_data:
+
+
+
 
 

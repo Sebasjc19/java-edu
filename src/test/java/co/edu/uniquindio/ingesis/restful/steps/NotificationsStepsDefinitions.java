@@ -1,138 +1,182 @@
 package co.edu.uniquindio.ingesis.restful.steps;
 
+import co.edu.uniquindio.ingesis.restful.domain.Role;
+import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationCreationRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.usuarios.LoginRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import io.cucumber.java.en.*;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 public class NotificationsStepsDefinitions {
 
+    private final UserStepDefinitions userSteps = new UserStepDefinitions();
+    private NotificationCreationRequest notificationCreationRequest;
     private Response response;
-    private Long notificacionIdExistente = 100L;
-    private Long notificacionIdEliminable = 101L;
+    @Getter
+    private Long notificationId;
+    private Long lastNotificationId;
+    Long studentId;
+    String studentToken;
+//  ----------------------------------------------
 
-    @Given("existe un estudiante con ID {long} con al menos {int} notificaciones registradas")
-    public void existeUnEstudianteConNotificaciones(Long studentId, int cantidad) {
-        for (int i = 0; i < cantidad; i++) {
-            given()
-                    .baseUri("http://localhost:8080")
-                    .contentType("application/json")
-                    .body(Map.of("studentId", studentId, "message", "Notificación #" + i))
-                    .when()
-                    .post("/notifications")
-                    .then()
-                    .statusCode(200);
-        }
+    @Given("Tengo los datos validos para crear una notificacion")
+    public void tengoLosDatosValidosParaCrearUnaNotificacion() {
+        notificationCreationRequest = new NotificationCreationRequest(
+                "Revisión de código",
+                1L
+        );
     }
 
-    @When("envío una solicitud GET a {string}")
-    public void envioSolicitudGET(String endpoint) {
+    @When("hago una peticion POST a notifications")
+    public void hagoUnaPeticionPOSTANotifications() {
         response = given()
                 .baseUri("http://localhost:8080")
+                .contentType("application/json")
+                .body(notificationCreationRequest)
                 .when()
-                .get(endpoint);
+                .post("/notifications");
+
+        notificationId = response.jsonPath().getLong("id");
     }
 
-    @Then("recibo un código de estado: {int}")
-    public void reciboCodigoDeEstado(int statusCode) {
+    @Then("la respuesta debe tener código de estado {int}")
+    public void laRespuestaDebeTenerCodigoDeEstado(int statusCode) {
         response.then().statusCode(statusCode);
     }
 
-    @And("el cuerpo contiene una lista de {int} notificaciones")
-    public void cuerpoContieneListaDeNotificaciones(int cantidadEsperada) {
-        response.then().body("size()", equalTo(cantidadEsperada));
+    @And("el cuerpo debe contener el message de la notificacion {string}")
+    public void elCuerpoDebeContenerElMessageDeLaNotificacion(String nombreEsperado) {
+        response.then().body("message", equalToIgnoringCase(nombreEsperado));
     }
 
-    @Given("existe una notificación con ID {long}")
-    public void existeUnaNotificacionConID(Long id) {
-        Map<String, Object> notificacion = Map.of(
-                "studentId", 1L,
-                "message", "Notificación existente"
-        );
+// -------------------------------------
+
+    @Given("Existe una notificacion con ID {int} de un estudiante")
+    public void existeUnaNotificacionDeEstudianteConID(int id) {
+        // Autenticarse como STUDENT
+        userSteps.crearYLoggearUsuarioConRol(Role.STUDENT);
+        Long studentUserId = userSteps.getUserId();
+
+        // Consultar si ya existe la notificación
+        Response getResponse = given()
+                .baseUri("http://localhost:8080")
+                .auth().oauth2(userSteps.getJwtToken())
+                .when()
+                .get("/notifications/" + id);
+
+        if (getResponse.statusCode() == 404) {
+            // Crear la notificación para el estudiante autenticado
+            NotificationCreationRequest nuevaNoti = new NotificationCreationRequest(
+                    "Notificación del estudiante",
+                    studentUserId
+            );
+
+            Response postResponse = given()
+                    .baseUri("http://localhost:8080")
+                    .auth().oauth2(userSteps.getJwtToken())
+                    .contentType("application/json")
+                    .body(nuevaNoti)
+                    .when()
+                    .post("/notifications");
+
+            postResponse.then().statusCode(201);
+            lastNotificationId = postResponse.jsonPath().getLong("id");
+
+        } else {
+            lastNotificationId = (long) id;
+        }
+    }
+
+
+    @When("hago una petición GET a notifications-{int} con un usuario con rol {string}")
+    public void hagoUnaPeticionGETPorId(int id, String rol) {
+        Role rolUsuario = Role.valueOf(rol.toUpperCase());
+        userSteps.crearYLoggearUsuarioConRol(rolUsuario);
+
         response = given()
                 .baseUri("http://localhost:8080")
-                .contentType("application/json")
-                .body(notificacion)
+                .auth().oauth2(userSteps.getJwtToken())
                 .when()
-                .post("/notifications");
-
-        // Sobrescribimos el ID existente para garantizar la prueba
-        notificacionIdExistente = response.jsonPath().getLong("id");
+                .get("/notifications/" + id);
     }
 
-    @And("el cuerpo contiene la información de la notificación con ID {long}")
-    public void cuerpoContieneInformacionDeNotificacion(Long idEsperado) {
-        response.then().body("id", equalTo(idEsperado.intValue()));
+    @And("el cuerpo debe contener el ID {int}")
+    public void elCuerpoDebeContenerElID(int idEsperado) {
+        response.then().body("id", equalTo(idEsperado));
     }
 
-    @Given("no existe una notificación con ID {long}")
-    public void noExisteNotificacionConID(Long id) {
-        // No se necesita hacer nada, se asume que el ID no existe
-    }
+// --------------------
 
-    @And("el cuerpo contiene el mensaje {string}")
-    public void elCuerpoContieneMensaje(String mensajeEsperado) {
-        response.then().body("message", containsStringIgnoringCase(mensajeEsperado));
-    }
+    @Given("existe un {string} con notificaciones asignadas")
+    public void existeUnUsuarioConNotificacionesAsignadas(String rolStr) {
+        Role rol = Role.valueOf(rolStr.toUpperCase());
 
-    @Given("existe un usuario con ID {long}")
-    public void existeUnUsuarioConID(Long idUsuario) {
-        // Aquí deberías tener un endpoint para crear o asegurar un usuario
+        UserRegistrationRequest nuevoUsuario = new UserRegistrationRequest(
+                "usuario_notif_" + rolStr.toLowerCase(),
+                "user@example.com",
+                "Password123",
+                "123456789",
+                LocalDate.of(1995, 1, 1),
+                1L,
+                rol
+        );
+
+        Response crearUsuarioResponse = given()
+                .baseUri("http://localhost:8080")
+                .contentType("application/json")
+                .body(nuevoUsuario)
+                .when()
+                .post("/users");
+
+        crearUsuarioResponse.then().statusCode(201);
+
+        studentId = crearUsuarioResponse.jsonPath().getLong("id");
+
+        LoginRequest loginRequest = new LoginRequest(nuevoUsuario.email(), "Password123");
+
+        Response loginResponse = given()
+                .baseUri("http://localhost:8080")
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .when()
+                .post("/auth");
+
+        studentToken = loginResponse.then().statusCode(200)
+                .extract().jsonPath().getString("respuesta.token");
+
+        NotificationCreationRequest noti = new NotificationCreationRequest("Test notificación", studentId);
+
         given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .body(Map.of("id", idUsuario, "name", "Estudiante Ejemplo", "email", "test@example.com"))
+                .auth().oauth2(studentToken)
+                .body(noti)
                 .when()
-                .post("/students")
+                .post("/notifications")
                 .then()
-                .statusCode(anyOf(is(200), is(201))); // Permitir creación o que ya exista
+                .statusCode(201);
     }
 
-    @When("envío una solicitud POST a {string} con el cuerpo:")
-    public void envioPostConCuerpo(String endpoint, String cuerpoJson) {
+    @When("hago una petición GET a notifications-2 con un usuario con rol {string}")
+    public void hagoUnaPeticionGETTodasLasNotificaciones(String rol) {
         response = given()
                 .baseUri("http://localhost:8080")
-                .contentType("application/json")
-                .body(cuerpoJson)
+                .auth().oauth2(studentToken)
                 .when()
-                .post(endpoint);
+                .get("/notifications/" + studentId);
     }
 
-    @And("el sistema envía la notificación al correo del estudiante")
-    public void sistemaEnvíaCorreo() {
-        // Aquí asumes que hay un campo que indica envío o logs
-        response.then().body("message", containsStringIgnoringCase("Bienvenido"));
+    @And("el cuerpo debe ser una lista")
+    public void elCuerpoDebeSerUnaLista() {
+        response.then().body("$", not(empty()));
     }
 
-    @Given("existe una notificación con ID {long} que puede eliminarse")
-    public void existeUnaNotificacionEliminable(Long id) {
-        Map<String, Object> notificacion = Map.of(
-                "studentId", 1L,
-                "message", "Notificación eliminable"
-        );
-        response = given()
-                .baseUri("http://localhost:8080")
-                .contentType("application/json")
-                .body(notificacion)
-                .when()
-                .post("/notifications");
-
-        notificacionIdEliminable = response.jsonPath().getLong("id");
-    }
-
-    @When("envío una solicitud DELETE a {string}")
-    public void envioSolicitudDELETE(String endpoint) {
-        response = given()
-                .baseUri("http://localhost:8080")
-                .when()
-                .delete(endpoint);
-    }
-
-    @And("el cuerpo contiene la información de la notificación eliminada")
-    public void cuerpoContieneInformacionEliminada() {
-        response.then().body("id", notNullValue());
-    }
 }
 

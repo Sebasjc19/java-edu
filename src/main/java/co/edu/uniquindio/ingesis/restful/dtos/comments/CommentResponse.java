@@ -11,10 +11,8 @@ public record CommentResponse(
         String content,
         LocalDate creationDate,
         @NotNull
-        @NotBlank
         Long professorId,
         @NotNull
-        @NotBlank
         Long programId
 ) {
 }
