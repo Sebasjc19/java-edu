@@ -178,7 +178,7 @@ public class CommentStepsDefinitions {
                 .get("/comments/" + tutorId);
     }
 
-    @And("el cuerpo debe ser una lista")
+    @And("el cuerpo debe ser una lista de comentarios")
     public void elCuerpoDebeSerUnaLista() {
         response.then().body("$", not(empty()));
     }
