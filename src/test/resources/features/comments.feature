@@ -24,7 +24,6 @@ Feature: Gestión de Comentarios
     When hago una petición PUT a "/comments/1"
     Then la respuesta debe tener código de estado 200
     And el cuerpo debe reflejar los datos actualizados
-    #cambiar and
 
   Scenario: Eliminar un comentario por ID
     Given Existe un comentario con ID 2

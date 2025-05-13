@@ -163,15 +163,15 @@ public class NotificationsStepsDefinitions {
                 .statusCode(201);
     }
 
-    @When("hago una petición GET a notifications-2 con un usuario con rol {string}")
-    public void hagoUnaPeticionGETTodasLasNotificaciones(String rol) {
-        response = given()
-                .baseUri("http://localhost:8080")
-                .auth().oauth2(studentToken)
-                .when()
-                .get("/notifications/" + studentId);
-    }
-
+//    @When("hago una petición GET a notifications-2 con un usuario con rol {string}")
+//    public void hagoUnaPeticionGETTodasLasNotificaciones(String rol) {
+//        response = given()
+//                .baseUri("http://localhost:8080")
+//                .auth().oauth2(studentToken)
+//                .when()
+//                .get("/notifications/" + studentId);
+//    }
+//
     @And("el cuerpo debe ser una lista de notificaciones")
     public void elCuerpoDebeSerUnaLista() {
         response.then().body("$", not(empty()));
