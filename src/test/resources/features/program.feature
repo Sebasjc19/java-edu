@@ -33,7 +33,8 @@ Feature: Gestión de Programas
     Then la respuesta debe tener codigo de estado 200
 
   Scenario: Ejecutar un programa existente
-    Given Existe un programa con ID 1
+    Given existe un usuario para programa con rol "STUDENT" autenticado
+    And creo un programa valido
     When hago una petición GET a "/programs/execute/1"
     Then la respuesta debe tener codigo de estado 200
     And el cuerpo debe contener el texto "print"
