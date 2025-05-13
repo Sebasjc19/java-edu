@@ -160,4 +160,14 @@ public class UserServiceImpl implements UserService {
         user.setStatus(Status.INACTIVE);
         user.persist();
     }
+
+    @Override
+    public UserResponse findByEmail(String correo) throws ResourceNotFoundException {
+        Optional<User> user = userRepository.findByEmail(correo);
+        if (user.isPresent()) {
+            auditLogger.info("Consulta de usuario por correo: correo='{}'", correo);
+            return userMapper.toUserResponse(user.get());
+        }
+        throw new ResourceNotFoundException("Usuario no encontrado");
+    }
 }
