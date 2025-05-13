@@ -123,8 +123,6 @@ public class ProgramStepDefinitions {
                 .auth().oauth2(userSteps.getToken())
                 .when()
                 .get("/programs/" + lastProgramId);
-
-        response.prettyPrint();
     }
 
     @And("el cuerpo debe contener el ID del programa")

@@ -48,7 +48,6 @@ public class UserStepDefinitions {
                 .body(datosUsuarioValido) // Enviamos el objeto con los datos del usuario
                 .when()
                 .post(url); // La ruta del endpoint
-        response.prettyPrint();
         userId = response.jsonPath().getLong("id");
         System.out.println("Respuesta: \n"+response.body().asString());
     }
