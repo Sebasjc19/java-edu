@@ -77,7 +77,7 @@ public class ProgramStepDefinitions {
         Response checkResponse = given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .when()
                 .get("/programs/" + userID);  // Usamos el ID en la ruta
 
@@ -109,7 +109,7 @@ public class ProgramStepDefinitions {
         response = given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .body(programCreationRequest)
                 .when()
                 .post("/programs");
@@ -121,7 +121,7 @@ public class ProgramStepDefinitions {
     public void hagoUnaPeticiónGETAlProgramaReciénCreado() {
         response = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .when()
                 .get("/programs/" + lastProgramId);
 
@@ -171,7 +171,7 @@ public class ProgramStepDefinitions {
         response = given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .body(updateRequest)
                 .when()
                 .put(ruta + lastProgramId);
@@ -198,7 +198,7 @@ public class ProgramStepDefinitions {
 
         Response getResponse = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getJwtToken())  // Aquí añades el token
+                .auth().oauth2(userSteps.getToken())  // Aquí añades el token
                 .when()
                 .get("/programs/" + programID);
 
@@ -212,7 +212,7 @@ public class ProgramStepDefinitions {
     public void hagoUnaPeticiónDELETEALaRuta(String url) {
         response = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .when()
                 .delete(url + lastProgramId);
     }
@@ -224,7 +224,7 @@ public class ProgramStepDefinitions {
         // Realizamos la petición GET para ejecutar el programa
         response = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .when()
                 .get(url);
     }
@@ -239,7 +239,7 @@ public class ProgramStepDefinitions {
         response = given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .when()
                 .get("/programs/user/" + userSteps.getUserId());  // Usamos el ID en la ruta
     }
