@@ -63,11 +63,12 @@ public class ProgramStepDefinitions {
     }
 
     // ----------------------------------------------------
-    @Given("existe un usuario con rol {string} autenticado")
-    public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
-        Role rol = Role.valueOf(rolUsuario.toUpperCase());
-        userSteps.crearYLoggearUsuarioConRol(rol);
-    }
+
+//    @Given("existe un usuario con rol {string} autenticado")
+//    public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
+//        Role rol = Role.valueOf(rolUsuario.toUpperCase());
+//        userSteps.crearYLoggearUsuarioConRol(rol);
+//    }
 
     @And("creo un programa válido")
     public void creoUnProgramaVálido() {
