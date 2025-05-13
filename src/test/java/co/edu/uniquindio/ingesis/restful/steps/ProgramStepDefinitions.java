@@ -60,7 +60,6 @@ public class ProgramStepDefinitions {
     }
 
     // ----------------------------------------------------
-
     @Given("existe un usuario para programa con rol {string} autenticado")
     public void existeUnUsuarioParaProgramaConRolAutenticado(String rolUsuario) {
         Role rol = Role.valueOf(rolUsuario.toUpperCase());
@@ -226,7 +225,7 @@ public class ProgramStepDefinitions {
                 .baseUri("http://localhost:8080")
                 .auth().oauth2(userSteps.getToken())
                 .when()
-                .get(url);
+                .get(url + lastProgramId);
     }
 
     @And("el cuerpo debe contener el texto {string}")

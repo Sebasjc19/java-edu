@@ -35,6 +35,6 @@ Feature: Gestión de Programas
   Scenario: Ejecutar un programa existente
     Given existe un usuario para programa con rol "STUDENT" autenticado
     And creo un programa valido
-    When hago una petición GET a "/programs/execute/1"
+    When hago una petición GET a "/programs/execute/"
     Then la respuesta debe tener codigo de estado 200
     And el cuerpo debe contener el texto "print"

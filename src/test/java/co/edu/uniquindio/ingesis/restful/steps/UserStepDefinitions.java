@@ -12,6 +12,7 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -31,7 +32,9 @@ public class UserStepDefinitions {
     public void datosUsuarioValido() {
         LocalDate localDate = LocalDate.now();
         datosUsuarioValido = new UserRegistrationRequest(
-                "prueba123","prueba123@mail.com","Contrasenia123!",
+                "username_nuevo" + UUID.randomUUID(),
+                "email_nuevo" + UUID.randomUUID() + "@gmail.com",
+                "Contrasenia123!",
                 "1234567", localDate/*Esta fecha es para probar unicamente*/, Role.STUDENT
         );
         System.out.println("Datos usuario: \n"+datosUsuarioValido.toString());
@@ -44,7 +47,8 @@ public class UserStepDefinitions {
                 .contentType(ContentType.JSON) // Especificamos que el cuerpo es JSON
                 .body(datosUsuarioValido) // Enviamos el objeto con los datos del usuario
                 .when()
-                .post("/users"); // La ruta del endpoint
+                .post(url); // La ruta del endpoint
+        response.prettyPrint();
         userId = response.jsonPath().getLong("id");
         System.out.println("Respuesta: \n"+response.body().asString());
     }
