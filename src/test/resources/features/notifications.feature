@@ -10,7 +10,7 @@ Feature: Gestión Notificaciones
     Given existe un "STUDENT" con notificaciones asignadas
     When hago una petición GET a notifications-2 con un usuario con rol "STUDENT"
     Then la respuesta debe tener código de estado 200
-    And el cuerpo debe ser una lista
+    And el cuerpo debe ser una lista de notificaciones
 
   Scenario: Crear una nueva notificacion
     Given Tengo los datos validos para crear una notificacion
