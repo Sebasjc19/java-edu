@@ -5,12 +5,14 @@ import co.edu.uniquindio.ingesis.restful.dtos.usuarios.LoginRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserUpdateRequest;
 import io.cucumber.java.en.*;
+import io.cucumber.java.ja.且つ;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.http.ContentType;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,6 +29,7 @@ public class UserStepDefinitions {
     private Long userId;
     @Getter
     private String token;
+    private String email;
 
     @Given("tengo los datos válidos de un nuevo usuario")
     public void datosUsuarioValido() {
@@ -35,9 +38,11 @@ public class UserStepDefinitions {
                 "username_nuevo" + UUID.randomUUID(),
                 "email_nuevo" + UUID.randomUUID() + "@gmail.com",
                 "Contrasenia123!",
-                "1234567", localDate/*Esta fecha es para probar unicamente*/, Role.STUDENT
+                "1234567",
+                localDate/*Esta fecha es para probar unicamente*/,
+                Role.STUDENT
         );
-        System.out.println("Datos usuario: \n"+datosUsuarioValido.toString());
+        email = datosUsuarioValido.email();
     }
 
     @When("envío una solicitud POST a {string}")
@@ -49,7 +54,6 @@ public class UserStepDefinitions {
                 .when()
                 .post(url); // La ruta del endpoint
         userId = response.jsonPath().getLong("id");
-        System.out.println("Respuesta: \n"+response.body().asString());
     }
 
     @Then("recibo un código de estado {int}")
@@ -77,27 +81,13 @@ public class UserStepDefinitions {
                 .accept(ContentType.JSON)
                 .when()
                 .get("/users/"+ userId);
-
-        System.out.println("Respuesta: \n"+response.body().asString());
     }
 
     @And("el cuerpo contiene la información del usuario")
     public void verificarCuerpoGet() {
         response.then()
                 .statusCode(200)
-                .body("respuesta.username", equalTo("prueba123"));
-    }
-
-    @Given("existe un usuario con correo {string}")
-    public void buscarUsuarioByEmail(String email) {
-        //Hallamos el usuario con el correo
-        response = given()
-                .accept(ContentType.JSON)
-                .when()
-                .get("/users/email/" + email);
-
-        userId = Long.valueOf(""+response.getBody().jsonPath().getInt("respuesta.id"));
-        System.out.println("Id de usuario: " + userId);
+                .body("respuesta.email", equalTo(email));
     }
 
     @And("tiene datos a actualizar")
@@ -118,8 +108,6 @@ public class UserStepDefinitions {
                 .body(datosUsuarioValidoActualizar)
                 .when()
                 .patch("/users/"+userId);
-
-        System.out.println("Respuesta PATCH:\n"+response.body().prettyPrint());
     }
 
     @And("el cuerpo contiene la información actualizada")
@@ -129,14 +117,13 @@ public class UserStepDefinitions {
 
 
 
-    @When("envío una solicitud DELETE a \\/users")
-    public void envioSolicitudDeleteA() {
+    @When("envío una solicitud DELETE a {string}")
+    public void envioSolicitudDeleteA(String ruta) {
+        loginUsuario(datosUsuarioValido.email(), datosUsuarioValido.password());
         response = given()
+                .auth().oauth2(this.getToken())
                 .when()
-                .delete("/users/"+userId);
-
-        System.out.println("Respuesta: \n"+response.body().prettyPrint());
-
+                .delete(ruta +userId);
     }
 
     @And("el cuerpo contiene el mensaje {string}")
@@ -146,35 +133,31 @@ public class UserStepDefinitions {
 
     @Given("soy un usuario con rol ADMIN")
     public void usuarioConRolAdmin() {
-        loginUsuario("admin@mail.com","Contrasenia123!");
+        LocalDate localDate = LocalDate.now();
+        datosUsuarioValido = new UserRegistrationRequest(
+                "username_nuevo" + UUID.randomUUID(),
+                "email_nuevo" + UUID.randomUUID() + "@gmail.com",
+                "Contrasenia123!",
+                "1234567",
+                localDate/*Esta fecha es para probar unicamente*/,
+                Role.ADMIN
+        );
+        email = datosUsuarioValido.email();
     }
 
-    @When("envio una solicitud GET a \\/users")
-    public void envioUnaSolicitudGETAUsers() {
+    @When("envio una solicitud GET a {string}")
+    public void envioUnaSolicitudGETAUsersActivos(String ruta) {
+        loginUsuario(datosUsuarioValido.email(), datosUsuarioValido.password());
         response = given()
-                .header("Authorization", "Bearer " + token) // Aquí va tu token
+                .auth().oauth2(this.getToken()) // Aquí va tu token
                 .accept(ContentType.JSON)
                 .when()
-                .get("/users");
-
-        System.out.println("Respuesta: \n" + response.getBody().asPrettyString());
-    }
-
-    @When("envio una solicitud GET a \\/users\\/activos")
-    public void envioUnaSolicitudGETAUsersActivos() {
-        response = given()
-                .header("Authorization", "Bearer " + token) // Aquí va tu token
-                .accept(ContentType.JSON)
-                .when()
-                .get("/users/active");
-
-        System.out.println("Respuesta: \n" + response.getBody().asPrettyString());
+                .get(ruta);
     }
 
     @And("el cuerpo contiene una lista de usuarios")
     public void verificarListaUsuarios() {
         response.then().body("", not(empty()));
-
     }
 
 
@@ -199,10 +182,7 @@ public class UserStepDefinitions {
                 .body()
                 .jsonPath()
                 .getString("respuesta.token"); // Ajusta el path al nombre correcto del token
-
-        System.out.println("token: "+token);
     }
-
 
 
     public void crearYLoggearUsuarioConRol(Role rol) {
@@ -211,4 +191,32 @@ public class UserStepDefinitions {
         loginUsuario(datosUsuarioValido.email(), datosUsuarioValido.password());
     }
 
+    @Given("existe un usuario con correo valido")
+    public void existeUnUsuarioConCorreoValido() {
+        //Hallamos el usuario con el correo
+        response = given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/users/email/" + email);
+
+        if (response.statusCode() == 404) {
+            // Si el código de respuesta es 404, significa que el usuario no existe
+            datosUsuarioValido();
+            envioPostUsers("/users");
+        }
+        userId = Long.valueOf(""+response.getBody().jsonPath().get("id"));
+        System.out.println("Id de usuario: " + userId);
+    }
+
+    @When("envio una solicitud PATCH a {string}")
+    public void envioUnaSolicitudPATCHA(String ruta) {
+        //TOCA LOGUEARSE PORQUE EL PATCH NECESITA TOKEN
+        loginUsuario(datosUsuarioValido.email(), datosUsuarioValido.password());
+        response = given()
+                .auth().oauth2(this.getToken())  // Autenticación primero
+                .contentType(ContentType.JSON)        // Luego se especifica el tipo de contenido
+                .body(datosUsuarioValidoActualizar)   // Luego el cuerpo de la petición
+                .when()
+                .patch(ruta + userId);                // Finalmente se realiza el PATCH
+    }
 }
