@@ -28,6 +28,7 @@ public class Program extends PanacheEntity {
     private LocalDate creationDate;
     private LocalDate modificationDate;
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Type type;
     @NotNull
     private Long userId;

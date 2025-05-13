@@ -21,7 +21,6 @@ public record UserRegistrationRequest(
         @Size (min = 8,message = "La longitud mínima es 8")
         String password,
 
-        @NotNull
         @NotBlank
         String identificationNumber,
 
@@ -29,8 +28,6 @@ public record UserRegistrationRequest(
         @PastOrPresent(message = "La fecha no puede ser futura")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate birthDate,
-
-        Long idGroup,
 
         Role role) {
 

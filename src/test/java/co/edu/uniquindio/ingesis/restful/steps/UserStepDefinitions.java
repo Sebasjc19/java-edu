@@ -8,8 +8,8 @@ import io.cucumber.java.en.*;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.http.ContentType;
+import lombok.Getter;
 
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -17,12 +17,14 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 
-public class UserStep {
+public class UserStepDefinitions {
 
     private Response response;
     private UserRegistrationRequest datosUsuarioValido;
     private UserUpdateRequest datosUsuarioValidoActualizar;
+    @Getter
     private Long userId;
+    @Getter
     private String token;
 
     @Given("tengo los datos válidos de un nuevo usuario")
@@ -30,7 +32,7 @@ public class UserStep {
         LocalDate localDate = LocalDate.now();
         datosUsuarioValido = new UserRegistrationRequest(
                 "prueba123","prueba123@mail.com","Contrasenia123!",
-                "1234567", localDate, 1L, Role.STUDENT
+                "1234567", localDate/*Esta fecha es para probar unicamente*/, Role.STUDENT
         );
         System.out.println("Datos usuario: \n"+datosUsuarioValido.toString());
     }
@@ -43,6 +45,7 @@ public class UserStep {
                 .body(datosUsuarioValido) // Enviamos el objeto con los datos del usuario
                 .when()
                 .post("/users"); // La ruta del endpoint
+        userId = response.jsonPath().getLong("id");
         System.out.println("Respuesta: \n"+response.body().asString());
     }
 
@@ -198,5 +201,11 @@ public class UserStep {
     }
 
 
+
+    public void crearYLoggearUsuarioConRol(Role rol) {
+        datosUsuarioValido();
+        envioPostUsers("/users");
+        loginUsuario(datosUsuarioValido.email(), datosUsuarioValido.password());
+    }
 
 }

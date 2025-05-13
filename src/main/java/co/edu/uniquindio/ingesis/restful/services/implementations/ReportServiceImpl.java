@@ -1,6 +1,8 @@
 package co.edu.uniquindio.ingesis.restful.services.implementations;
 
+import co.edu.uniquindio.ingesis.restful.domain.Group;
 import co.edu.uniquindio.ingesis.restful.domain.Report;
+import co.edu.uniquindio.ingesis.restful.domain.User;
 import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportResponse;
 import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
@@ -9,6 +11,8 @@ import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ReportRepositor
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ReportService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +28,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Inject
     ReportMapper reportMapper;
+    @Inject
     ReportRepository reportRepository;
 
     private static final Logger auditLogger = LoggerFactory.getLogger("audit");
@@ -83,8 +88,17 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Transactional
     public ReportResponse createReport(ReportCreationRequest request) {
         Report report = reportMapper.parseOf(request);
+        Group group = Group.findById(report.getGroupId());
+        if(group == null) {
+            throw new NotFoundException("Grupo con ID " + request.groupId() + " no existe.");
+        }
+        User professor = User.findById(report.getProfessorId());
+        if(professor == null) {
+            throw new NotFoundException("Profesor con ID " + request.professorId() + " no existe.");
+        }
         report.setCreationDate(LocalDate.now());
         report.persist();
 
@@ -96,6 +110,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Transactional
     public ReportResponse deleteReport(Long id) {
         // Validar si el reporte a eliminar se encuentra en la base de datos
         Optional<Report> optionalReport = reportRepository.findByIdOptional(id);
