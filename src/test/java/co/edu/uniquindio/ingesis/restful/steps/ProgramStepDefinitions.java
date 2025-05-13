@@ -83,7 +83,7 @@ public class ProgramStepDefinitions {
         response = given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .body(programCreationRequest)
                 .when()
                 .post("/programs");
@@ -95,7 +95,7 @@ public class ProgramStepDefinitions {
     public void hagoUnaPeticiónGETAlProgramaReciénCreado() {
         response = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .when()
                 .get("/programs/" + lastProgramId);
     }
