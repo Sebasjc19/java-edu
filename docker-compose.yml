@@ -109,6 +109,18 @@ services:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
 
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8081:8080"    # Jenkins UI accesible en localhost:8081
+      - "50000:50000"  # Puerto para agentes
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - backend
+
 #networks:
 #  monitoring:
 #    networks:
@@ -122,5 +134,7 @@ volumes:
   postgres_data:
   grafana-data:
   elastic_data:
+  jenkins_home:
+
 
 
