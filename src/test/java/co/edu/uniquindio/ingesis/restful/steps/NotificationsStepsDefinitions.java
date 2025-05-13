@@ -172,7 +172,7 @@ public class NotificationsStepsDefinitions {
                 .get("/notifications/" + studentId);
     }
 
-    @And("el cuerpo debe ser una lista")
+    @And("el cuerpo debe ser una lista de notificaciones")
     public void elCuerpoDebeSerUnaLista() {
         response.then().body("$", not(empty()));
     }
