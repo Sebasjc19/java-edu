@@ -9,6 +9,7 @@ import io.restassured.response.Response;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -78,18 +79,22 @@ public class ProgramStepDefinitions {
                 .contentType("application/json")
                 .auth().oauth2(userSteps.getToken())
                 .when()
-                .get("/programs/" + userID);  // Usamos el ID en la ruta
+                .get("/programs/user/" + userID);  // Usamos el ID en la ruta
 
         // 2. Comprobar el código de respuesta
         if (checkResponse.statusCode() == 200) {
-            // Si el código de respuesta es 200, significa que el programa existe
-            System.out.println("El usuario con ID " + userID + " ya tiene al menos un programa." +
-                    " No se creará otro.");
-            List<Long> ids = checkResponse.jsonPath().getList("id");
-            if (!ids.isEmpty()) {
-                lastProgramId = ids.getFirst();  // O usa la lógica que necesites para obtener el ID
+            // Se asume que la respuesta es una lista de objetos con campos "id"
+            List<Map<String, Object>> programas = checkResponse.jsonPath().getList("");
+            if (!programas.isEmpty()) {
+                Integer id = (Integer) programas.get(0).get("id");
+                lastProgramId = id.longValue();
+                System.out.println("Ya existe un programa con ID: " + lastProgramId);
+                return;
             }
-            return;  // No se creará el programa nuevamente
+        } else if (checkResponse.statusCode() == 404) {
+            System.out.println("No hay programas existentes para el usuario " + userID + ". Se procederá a crear uno.");
+        } else {
+            throw new RuntimeException("Error inesperado al consultar programas: " + checkResponse.statusCode());
         }
 
         programCreationRequest = new ProgramCreationRequest(
@@ -152,7 +157,7 @@ public class ProgramStepDefinitions {
 
     @Given("Existe un programa y datos nuevos validos")
     public void existeUnProgramaYDatosNuevosValidos() {
-        existeUnUsuarioParaProgramaConRolAutenticado("Tutor");
+        existeUnUsuarioParaProgramaConRolAutenticado(String.valueOf(Role.TUTOR));
         creoUnProgramaValido();
         // Datos nuevos para actualizar
         updateRequest = new UpdateProgramRequest(
