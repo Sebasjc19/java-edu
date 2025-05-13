@@ -1,3 +1,5 @@
+Feature: Gestión de Usuarios
+
 Scenario: Crear un nuevo usuario
 Given tengo los datos válidos de un nuevo usuario
 When envío una solicitud POST a "/users"

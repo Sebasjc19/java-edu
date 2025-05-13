@@ -174,7 +174,15 @@ public class ProgramServiceImpl implements ProgramService {
 
 
     private String runJavaContainer(String cmd) throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder("sh", "-c", cmd);
+        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+
+        ProcessBuilder pb;
+        if (isWindows) {
+            pb = new ProcessBuilder("cmd.exe", "/c", cmd);
+        } else {
+            pb = new ProcessBuilder("sh", "-c", cmd);
+        }
+
         pb.redirectErrorStream(true);
         Process process = pb.start();
 
