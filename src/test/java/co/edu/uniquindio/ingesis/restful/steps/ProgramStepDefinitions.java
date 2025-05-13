@@ -12,8 +12,8 @@ import io.restassured.response.Response;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
+import static co.edu.uniquindio.ingesis.restful.steps.CommentStepsDefinitions.existeUnUsuarioConRolAutenticado;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
@@ -64,11 +64,13 @@ public class ProgramStepDefinitions {
     }
 
     // ----------------------------------------------------
-    @Given("existe un usuario con rol {string} autenticado")
+    /*
+        @Given("existe un usuario con rol {string} autenticado")
     public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
         Role rol = Role.valueOf(rolUsuario.toUpperCase());
         userSteps.crearYLoggearUsuarioConRol(rol);
     }
+     */
 
     @And("creo un programa válido")
     public void creoUnProgramaVálido() {
@@ -220,8 +222,8 @@ public class ProgramStepDefinitions {
                 .put(ruta);
     }
 
-    @And("el cuerpo debe reflejar los datos actualizados")
-    public void elCuerpoDebeReflejarLosDatosActualizados() {
+    @And("el cuerpo del programa debe reflejar los datos actualizados")
+    public void elCuerpoDelProgramaDebeReflejarLosDatosActualizados() {
         response.then()
                 .body("title", equalTo(updateRequest.title()))
                 .body("description", equalTo(updateRequest.description()))
@@ -247,8 +249,8 @@ public class ProgramStepDefinitions {
     }
 
 
-    @When("hago una petición DELETE a {string}")
-    public void hagoUnaPeticiónDELETEA(String url) {
+    @When("hago una petición DELETE a la ruta {string}")
+    public void hagoUnaPeticiónDELETEALaRuta(String url) {
         response = given()
                 .baseUri("http://localhost:8080")
                 .auth().oauth2(userSteps.getJwtToken())

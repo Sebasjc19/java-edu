@@ -23,11 +23,11 @@ Feature: Gestión de Programas
     Given Existe un programa y datos nuevos validos
     When hago una peticion PUT a "/programs/1"
     Then la respuesta debe tener codigo de estado 200
-    And el cuerpo debe reflejar los datos actualizados
+    And el cuerpo del programa debe reflejar los datos actualizados
 
   Scenario: Eliminar un programa por ID
     Given Existe un programa con ID 1
-    When hago una petición DELETE a "/programs/1"
+    When hago una petición DELETE a la ruta "/programs/1"
     Then la respuesta debe tener codigo de estado 200
 
   Scenario: Ejecutar un programa existente

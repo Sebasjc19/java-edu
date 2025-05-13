@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.*;
 
 public class CommentStepsDefinitions {
 
-    private final UserStepDefinitions userSteps = new UserStepDefinitions();
+    private static final UserStepDefinitions userSteps = new UserStepDefinitions();
     private CommentCreationRequest commentCreationRequest;
     private UpdateCommentRequest updateCommentRequest;
     private Response response;
@@ -65,7 +65,7 @@ public class CommentStepsDefinitions {
     // ----------------------------
 
     @Given("existe un usuario con rol {string} autenticado")
-    public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
+    public static void existeUnUsuarioConRolAutenticado(String rolUsuario) {
         Role rol = Role.valueOf(rolUsuario.toUpperCase());
         userSteps.crearYLoggearUsuarioConRol(rol);
     }
@@ -178,8 +178,8 @@ public class CommentStepsDefinitions {
                 .get("/comments/" + tutorId);
     }
 
-    @And("el cuerpo debe ser una lista")
-    public void elCuerpoDebeSerUnaLista() {
+    @And("el cuerpo debe ser una lista de comentarios")
+    public void elCuerpoDebeSerUnaListaDeComentarios() {
         response.then().body("$", not(empty()));
     }
 
@@ -232,5 +232,4 @@ public class CommentStepsDefinitions {
                 .when()
                 .delete("/comments/" + id);
     }
-
 }

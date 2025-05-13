@@ -11,7 +11,7 @@ Feature: Gestión de Comentarios
     Given existe un usuario con comments asignados
     When consulto los comments del usuario autenticado
     Then la respuesta debe tener código de estado 200
-    And el cuerpo debe ser una lista
+    And el cuerpo debe ser una lista de comentarios
 
   Scenario: Crear un nuevo comentario
     Given Tengo los datos validos para crear un comentario
