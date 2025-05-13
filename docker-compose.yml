@@ -110,9 +110,8 @@ services:
       RABBITMQ_DEFAULT_PASS: admin
 
 networks:
+  backend:
   monitoring:
-    networks:
-      - monitoring
 
 volumes:
   postgres_data:
