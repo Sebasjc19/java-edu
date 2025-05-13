@@ -2,7 +2,6 @@ package co.edu.uniquindio.ingesis.restful.steps;
 import co.edu.uniquindio.ingesis.restful.domain.Role;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.CommentCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.comments.UpdateCommentRequest;
-import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.LoginRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import io.cucumber.java.en.Given;
@@ -19,6 +18,7 @@ import static org.hamcrest.Matchers.*;
 public class CommentStepsDefinitions {
 
     private final UserStepDefinitions userSteps = new UserStepDefinitions();
+    private final CommonStepsDefinitions commonSteps = new CommonStepsDefinitions();
     private CommentCreationRequest commentCreationRequest;
     private UpdateCommentRequest updateCommentRequest;
     private Response response;
@@ -64,11 +64,11 @@ public class CommentStepsDefinitions {
 
     // ----------------------------
 
-    @Given("existe un usuario con rol {string} autenticado")
-    public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
-        Role rol = Role.valueOf(rolUsuario.toUpperCase());
-        userSteps.crearYLoggearUsuarioConRol(rol);
-    }
+//    @Given("existe un usuario con rol {string} autenticado")
+//    public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
+//        Role rol = Role.valueOf(rolUsuario.toUpperCase());
+//        userSteps.crearYLoggearUsuarioConRol(rol);
+//    }
 
     @And("creo un comentario valido")
     public void creoUnComentarioValido() {
@@ -212,7 +212,7 @@ public class CommentStepsDefinitions {
 
     @Given("Existe un comentario con ID {int}")
     public void existeUnProgramaConID(int commentId) {
-        existeUnUsuarioConRolAutenticado("TUTOR");
+        commonSteps.existeUnUsuarioConRolAutenticado("TUTOR");
 
         Response getResponse = given()
                 .baseUri("http://localhost:8080")

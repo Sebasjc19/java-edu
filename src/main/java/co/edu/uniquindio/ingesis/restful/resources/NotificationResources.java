@@ -45,12 +45,4 @@ public class NotificationResources {
         notificationService.sendNotification(request);
         return Response.status(Response.Status.CREATED).build();
     }
-
-    @DELETE
-    @RolesAllowed({"STUDENT","TUTOR"})
-    @Path("/{id}")
-    public Response deleteNotification(@PathParam("id") Long id) {
-        NotificationResponse notificationResponse = notificationService.deleteNotification(id);
-        return Response.ok(notificationResponse).build();
-    }
 }

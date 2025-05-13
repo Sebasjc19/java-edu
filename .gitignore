@@ -57,3 +57,7 @@ logs
 
 # ignorar la bd
 bd
+
+jenkins_home/
+
+data/
