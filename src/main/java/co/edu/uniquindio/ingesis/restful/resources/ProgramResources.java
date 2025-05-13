@@ -31,7 +31,7 @@ public class ProgramResources {
      */
     @GET
     @RolesAllowed({"STUDENT", "TUTOR"})
-    @Path("/{userId}")
+    @Path("/user/{userId}")
     public Response findProgramsByUserId(@PathParam("userId") Long userId) {
         List<ProgramResponse> programResponses = programService.findProgramsByUserId(userId);
         return Response.ok(programResponses).build();

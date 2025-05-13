@@ -4,16 +4,12 @@ import co.edu.uniquindio.ingesis.restful.domain.Role;
 import co.edu.uniquindio.ingesis.restful.domain.Type;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.ProgramCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.programs.UpdateProgramRequest;
-import co.edu.uniquindio.ingesis.restful.dtos.usuarios.LoginRequest;
-import co.edu.uniquindio.ingesis.restful.dtos.usuarios.UserRegistrationRequest;
 import io.cucumber.java.en.*;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import lombok.Getter;
 
-import java.time.LocalDate;
+import java.util.List;
 
-import static co.edu.uniquindio.ingesis.restful.steps.CommentStepsDefinitions.existeUnUsuarioConRolAutenticado;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
@@ -64,16 +60,38 @@ public class ProgramStepDefinitions {
     }
 
     // ----------------------------------------------------
-    /*
-        @Given("existe un usuario con rol {string} autenticado")
-    public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
+
+    @Given("existe un usuario para programa con rol {string} autenticado")
+    public void existeUnUsuarioParaProgramaConRolAutenticado(String rolUsuario) {
         Role rol = Role.valueOf(rolUsuario.toUpperCase());
         userSteps.crearYLoggearUsuarioConRol(rol);
     }
-     */
 
-    @And("creo un programa válido")
-    public void creoUnProgramaVálido() {
+    @And("creo un programa valido")
+    public void creoUnProgramaValido() {
+
+        // Definir el ID del programa a verificar si ya existe
+        Long userID = userSteps.getUserId();
+
+        // 1. Verificar si hay programas para el usuario
+        Response checkResponse = given()
+                .baseUri("http://localhost:8080")
+                .contentType("application/json")
+                .auth().oauth2(userSteps.getJwtToken())
+                .when()
+                .get("/programs/" + userID);  // Usamos el ID en la ruta
+
+        // 2. Comprobar el código de respuesta
+        if (checkResponse.statusCode() == 200) {
+            // Si el código de respuesta es 200, significa que el programa existe
+            System.out.println("El usuario con ID " + userID + " ya tiene al menos un programa." +
+                    " No se creará otro.");
+            List<Long> ids = checkResponse.jsonPath().getList("id");
+            if (!ids.isEmpty()) {
+                lastProgramId = ids.getFirst();  // O usa la lógica que necesites para obtener el ID
+            }
+            return;  // No se creará el programa nuevamente
+        }
 
         programCreationRequest = new ProgramCreationRequest(
                 "Ingenieria de Prueba",
@@ -106,6 +124,8 @@ public class ProgramStepDefinitions {
                 .auth().oauth2(userSteps.getJwtToken())
                 .when()
                 .get("/programs/" + lastProgramId);
+
+        response.prettyPrint();
     }
 
     @And("el cuerpo debe contener el ID del programa")
@@ -114,71 +134,6 @@ public class ProgramStepDefinitions {
     }
 
     // ----------------------------------------------------
-
-    @Given("existe un tutor con programas asignados")
-    public void existeUnTutorConProgramasAsignados() {
-        // Se crea el tutor
-        UserRegistrationRequest nuevoTutor = new UserRegistrationRequest(
-                "tutor_mario_castañeda",
-                "tutor@example.com",
-                "Salem2004",
-                "1234567890",
-                LocalDate.of(2000, 5, 20),
-                Role.TUTOR
-        );
-
-        Response crearUsuarioResponse = given()
-                .baseUri("http://localhost:8080")
-                .contentType("application/json")
-                .body(nuevoTutor)
-                .when()
-                .post("/users");
-
-        crearUsuarioResponse.then().statusCode(201);
-
-        tutorId = crearUsuarioResponse.jsonPath().getLong("id");
-
-        // Se autentica y obtiene el token
-        LoginRequest loginRequest = new LoginRequest(
-                nuevoTutor.email(),
-                "Salem2004" // misma que usaste en el registro
-        );
-
-        // Hacer la solicitud POST al endpoint de login
-        Response loginResponse = given()
-                .baseUri("http://localhost:8080")
-                .contentType(ContentType.JSON)
-                .body(loginRequest) // Enviar el loginRequest en el cuerpo de la solicitud
-                .when()
-                .post("/auth"); // Ruta del endpoint de autenticación
-
-        // Se extrae el token de la respuesta
-        tutorToken = loginResponse.then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getString("respuesta.token"); // Ajusta el path al nombre correcto del token
-
-        // Se crea un programa asociado a dicho tutor
-        ProgramCreationRequest nuevoPrograma = new ProgramCreationRequest(
-                "Programa de prueba",
-                "Descripción de prueba",
-                "System.out.println('Hola mundo');",
-                Type.NORMAL,
-                tutorId
-        );
-
-        Response crearProgramaResponse = given()
-                .baseUri("http://localhost:8080")
-                .contentType("application/json")
-                .auth().oauth2(tutorToken)
-                .body(nuevoPrograma)
-                .when()
-                .post("/programs");
-
-        crearProgramaResponse.then().statusCode(201);
-    }
 
     @When("consulto los programas del tutor autenticado")
     public void consultoLosProgramasDelTutorAutenticado() {
@@ -200,30 +155,33 @@ public class ProgramStepDefinitions {
 
     @Given("Existe un programa y datos nuevos validos")
     public void existeUnProgramaYDatosNuevosValidos() {
-        existeUnTutorConProgramasAsignados(); // Se reutiliza para crear el usuario y el programa asignado a este
-
+        existeUnUsuarioParaProgramaConRolAutenticado("Tutor");
+        creoUnProgramaValido();
         // Datos nuevos para actualizar
         updateRequest = new UpdateProgramRequest(
                 "Nombre actualizado",
                 "Descripción actualizada",
                 "System.out.println('Actualizado');",
-                1L
+                userSteps.getUserId()
         );
     }
 
-    @When("hago una peticion PUT a {string}")
-    public void hagoUnaPeticionPUTA(String ruta) {
+    @When("hago una peticion PUT hacia la ruta {string}")
+    public void hagoUnaPeticionPUTHaciaLaRuta(String ruta) {
         response = given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .auth().oauth2(tutorToken)
+                .auth().oauth2(userSteps.getJwtToken())
                 .body(updateRequest)
                 .when()
-                .put(ruta);
+                .put(ruta + lastProgramId);
+
     }
 
     @And("el cuerpo del programa debe reflejar los datos actualizados")
     public void elCuerpoDelProgramaDebeReflejarLosDatosActualizados() {
+
+        System.out.println(updateRequest.toString());
         response.then()
                 .body("title", equalTo(updateRequest.title()))
                 .body("description", equalTo(updateRequest.description()))
@@ -235,7 +193,8 @@ public class ProgramStepDefinitions {
 
     @Given("Existe un programa con ID {int}")
     public void existeUnProgramaConID(int programID) {
-        existeUnUsuarioConRolAutenticado("TUTOR");
+        existeUnUsuarioParaProgramaConRolAutenticado("Tutor");
+        creoUnProgramaValido();
 
         Response getResponse = given()
                 .baseUri("http://localhost:8080")
@@ -244,7 +203,7 @@ public class ProgramStepDefinitions {
                 .get("/programs/" + programID);
 
         if (getResponse.statusCode() == 404) {
-            creoUnProgramaVálido();
+            //creoUnProgramaVálido();
         }
     }
 
@@ -255,7 +214,7 @@ public class ProgramStepDefinitions {
                 .baseUri("http://localhost:8080")
                 .auth().oauth2(userSteps.getJwtToken())
                 .when()
-                .delete(url);
+                .delete(url + lastProgramId);
     }
 
     // ----------------------------------------------------
@@ -273,5 +232,15 @@ public class ProgramStepDefinitions {
     @And("el cuerpo debe contener el texto {string}")
     public void elCuerpoDebeContenerElTexto(String textCode) {
         response.then().body(containsString(textCode));
+    }
+
+    @When("consulto los programas del usuario autenticado")
+    public void consultoLosProgramasDelUsuarioAutenticado() {
+        response = given()
+                .baseUri("http://localhost:8080")
+                .contentType("application/json")
+                .auth().oauth2(userSteps.getJwtToken())
+                .when()
+                .get("/programs/user/" + userSteps.getUserId());  // Usamos el ID en la ruta
     }
 }

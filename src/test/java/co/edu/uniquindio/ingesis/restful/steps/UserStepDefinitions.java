@@ -7,6 +7,8 @@ import io.cucumber.java.en.*;
 import io.restassured.response.Response;
 import io.restassured.http.ContentType;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -23,6 +25,7 @@ public class UserStepDefinitions {
     private Long userId;
     private UserRegistrationRequest userRegistrationRequest;
     @Getter
+    @Setter
     private String jwtToken; //  Aquí se almacena el token
 
     @Given("tengo los datos válidos de un nuevo usuario")
@@ -117,7 +120,4 @@ public class UserStepDefinitions {
                 .jsonPath()
                 .getString("respuesta.token"); // Ajusta el path al nombre correcto del token
     }
-
-
-
 }

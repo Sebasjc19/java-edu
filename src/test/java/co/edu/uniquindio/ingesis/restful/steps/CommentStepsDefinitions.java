@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.*;
 
 public class CommentStepsDefinitions {
 
-    private static final UserStepDefinitions userSteps = new UserStepDefinitions();
+    private final UserStepDefinitions userSteps = new UserStepDefinitions();
     private CommentCreationRequest commentCreationRequest;
     private UpdateCommentRequest updateCommentRequest;
     private Response response;
@@ -65,7 +65,7 @@ public class CommentStepsDefinitions {
     // ----------------------------
 
     @Given("existe un usuario con rol {string} autenticado")
-    public static void existeUnUsuarioConRolAutenticado(String rolUsuario) {
+    public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
         Role rol = Role.valueOf(rolUsuario.toUpperCase());
         userSteps.crearYLoggearUsuarioConRol(rol);
     }
