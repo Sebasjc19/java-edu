@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
     @Inject
     UserRepository userRepository;
 
+
     private static final Logger auditLogger = LoggerFactory.getLogger("audit");
 
     @Transactional
@@ -52,6 +53,12 @@ public class UserServiceImpl implements UserService {
         user.setRegistrationDate(LocalDate.now());
         user.setStatus(Status.ACTIVE);
         user.persist();
+        // Después de guardar, enviar correo de bienvenida
+        String asunto = "¡Bienvenido a la plataforma!";
+        String mensaje = "Hola " + user.getUsername() + ",\n\n" +
+                "Gracias por registrarte. ¡Nos alegra tenerte con nosotros!";
+
+        //sendEmailService.enviarCorreo(user.getEmail(), asunto, mensaje);
 
 
         auditLogger.info("Usuario creado: username='{}', email='{}'", request.username(), request.email());
@@ -123,15 +130,10 @@ public class UserServiceImpl implements UserService {
 
 
         User user = optionalUser.get();
-        if (request.username().isPresent()) {
-            user.setUsername(request.username().get());
-        }
-        if (request.email().isPresent()) {
-            user.setEmail(request.email().get());
-        }
-        if (request.password().isPresent()) {
-            user.setPassword(request.password().get());
-        }
+        request.username().ifPresent(user::setUsername);
+        request.email().ifPresent(user::setEmail);
+        request.password().ifPresent(user::setPassword);
+
 
         user.persist();
 

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record NotificationResponse(
+        Long id,
         @Size(min = 3, max = 20)
         String message,
         LocalDate sentDate,

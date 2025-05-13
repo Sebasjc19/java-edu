@@ -5,6 +5,7 @@ import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportResponse;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ReportService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportResources {
 
+    @Inject
     ReportService reportService;
 
     @GET

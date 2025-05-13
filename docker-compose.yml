@@ -10,24 +10,26 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
-#  app:
-#    image: my-quarkus-app:latest
-#    build:
-#      context: .
-#      dockerfile: src/main/docker/Dockerfile.native-micro
-#    environment:
-#      QUARKUS_DATASOURCE_DB_KIND: postgresql
-#      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/mydatabase
-#      QUARKUS_DATASOURCE_USERNAME: myuser
-#      QUARKUS_DATASOURCE_PASSWORD: mypassword
-#      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: drop-and-create
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - postgres
-
-##############################
+  #  app:
+  #    image: my-quarkus-app:latest
+  #    build:
+  #      context: .
+  #      dockerfile: src/main/docker/Dockerfile.native-micro
+  #    environment:
+  #      QUARKUS_DATASOURCE_DB_KIND: postgresql
+  #      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/mydatabase
+  #      QUARKUS_DATASOURCE_USERNAME: myuser
+  #      QUARKUS_DATASOURCE_PASSWORD: mypassword
+  #      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: drop-and-create
+  #    ports:
+  #      - "8080:8080"
+  #    depends_on:
+  #      - postgres
+  #    networks:
+  #      - backend
 
   prometheus:
     image: prom/prometheus:latest
@@ -93,15 +95,24 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
       - "5601:5601"
-    networks:
-      - monitoring
     depends_on:
       - elasticsearch
 
-
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
 
 networks:
   monitoring:
+    networks:
+      - monitoring
 
 volumes:
   postgres_data:

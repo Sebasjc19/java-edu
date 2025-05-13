@@ -79,15 +79,5 @@ public class ProgramResources {
         ProgramResponse programResponse = programService.deleteProgram(id);
         return Response.ok(programResponse).build();
     }
-    @GET
-    @RolesAllowed({"STUDENT", "TUTOR"})
-    @Path("/execute/{id}")
-    public Response ejecutarPrograma(@PathParam("id") Long id) {
-        try {
-            String resultado = programService.executeProgram(id);
-            return Response.ok(resultado).build();
-        } catch (IOException | InterruptedException | ResourceNotFoundException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al ejecutar: " + e.getMessage()).build();
-        }
-    }
+
 }

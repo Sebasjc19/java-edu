@@ -4,9 +4,11 @@ import co.edu.uniquindio.ingesis.restful.domain.Comment;
 import co.edu.uniquindio.ingesis.restful.domain.Notification;
 import co.edu.uniquindio.ingesis.restful.domain.User;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationCreationRequest;
+import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationDTO;
 import co.edu.uniquindio.ingesis.restful.dtos.notifications.NotificationResponse;
 import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.ResourceNotFoundException;
 import co.edu.uniquindio.ingesis.restful.mappers.NotificationMapper;
+import co.edu.uniquindio.ingesis.restful.producers.NotificationProducer;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.NotificationRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.NotificationService;
@@ -33,6 +35,8 @@ public class NotificationServiceImpl implements NotificationService {
     NotificationRepository notificationRepository;
     @Inject
     UserRepository userRepository;
+    @Inject
+    NotificationProducer notificationProducer;
 
     private static final Logger auditLogger = LoggerFactory.getLogger("audit");
 
@@ -68,27 +72,30 @@ public class NotificationServiceImpl implements NotificationService {
         }
         Notification notification = optionalNotification.get();
 
-        auditLogger.info("Consulta de notificación por ID: id='{}'",
-                id);
+        auditLogger.info("Consulta de notificación por ID", id);
 
         return notificationMapper.toNotificationResponse(notification);
     }
 
     @Override
-    public NotificationResponse createNotification(NotificationCreationRequest request) {
+    public void sendNotification(NotificationCreationRequest request) {
         Optional<User> useOptional = userRepository.findByIdOptional(request.studentId());
         if(useOptional.isEmpty()){
-            throw new ResourceNotFoundException("No se encuentra un estudiante");
+            throw new ResourceNotFoundException("No se encuentra un usuario");
         }
-        Notification notification = notificationMapper.parseOf(request);
-        notification.setSentDate(LocalDate.now());
-        notification.setRead(false);
-        notification.persist();
+        User user = useOptional.get();
+        NotificationDTO notificationDTO = new NotificationDTO(user.getEmail(),"Creacion de cuenta",request.message(), request.studentId());
+        notificationProducer.sendNotificacion(notificationDTO);
 
-        auditLogger.info("Notificación creada: destinatarioId='{}', fecha='{}'"
-                , request.studentId(), notification.getSentDate());
+        //Notification notification = notificationMapper.parseOf(request);
+        //notification.setSentDate(LocalDate.now());
+        //notification.setRead(false);
+        //notification.persist();
 
-        return notificationMapper.toNotificationResponse(notification);
+        //auditLogger.info("Notificación creada: destinatarioId='{}', fecha='{}'"
+        //        , request.studentId(), notification.getSentDate());
+
+        //return notificationMapper.toNotificationResponse(notification);
     }
 
     @Override
