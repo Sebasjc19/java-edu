@@ -98,21 +98,4 @@ public class NotificationServiceImpl implements NotificationService {
         //return notificationMapper.toNotificationResponse(notification);
     }
 
-    @Override
-    public NotificationResponse deleteNotification(Long id) {
-        // Validar si la notificación a borrar se encuentra en la base de datos
-        Optional<Notification> optionalNotification = notificationRepository.findByIdOptional(id);
-        if (optionalNotification.isEmpty()) {
-            throw  new ResourceNotFoundException("Notificacion no encontrada");
-        }
-
-        // Obtener la notificación y eliminarlo
-        Notification notification = optionalNotification.get();
-        notification.delete();
-
-        auditLogger.info("Notificación eliminada: id='{}'",
-                id);
-
-        return notificationMapper.toNotificationResponse(notification);
-    }
 }
