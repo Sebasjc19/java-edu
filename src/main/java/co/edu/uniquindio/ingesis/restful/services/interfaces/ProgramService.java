@@ -14,4 +14,5 @@ public interface ProgramService {
     ProgramResponse createProgram(ProgramCreationRequest request);
     ProgramResponse updateProgramById(Long id, UpdateProgramRequest request);
     ProgramResponse deleteProgram(Long id) throws ResourceNotFoundException;
+    String executeProgram(Long id) throws InterruptedException, IOException;
 }

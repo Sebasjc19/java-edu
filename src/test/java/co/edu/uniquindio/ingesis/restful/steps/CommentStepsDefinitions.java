@@ -179,7 +179,7 @@ public class CommentStepsDefinitions {
     }
 
     @And("el cuerpo debe ser una lista de comentarios")
-    public void elCuerpoDebeSerUnaListaDeComentarios() {
+    public void elCuerpoDebeSerUnaLista() {
         response.then().body("$", not(empty()));
     }
 
@@ -232,4 +232,5 @@ public class CommentStepsDefinitions {
                 .when()
                 .delete("/comments/" + id);
     }
+
 }

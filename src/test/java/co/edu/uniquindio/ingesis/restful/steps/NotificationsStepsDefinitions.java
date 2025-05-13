@@ -67,7 +67,7 @@ public class NotificationsStepsDefinitions {
         // Consultar si ya existe la notificación
         Response getResponse = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .when()
                 .get("/notifications/" + id);
 
@@ -80,7 +80,7 @@ public class NotificationsStepsDefinitions {
 
             Response postResponse = given()
                     .baseUri("http://localhost:8080")
-                    .auth().oauth2(userSteps.getJwtToken())
+                    .auth().oauth2(userSteps.getToken())
                     .contentType("application/json")
                     .body(nuevaNoti)
                     .when()
@@ -102,7 +102,7 @@ public class NotificationsStepsDefinitions {
 
         response = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getJwtToken())
+                .auth().oauth2(userSteps.getToken())
                 .when()
                 .get("/notifications/" + id);
     }
@@ -173,8 +173,9 @@ public class NotificationsStepsDefinitions {
     }
 
     @And("el cuerpo debe ser una lista de notificaciones")
-    public void elCuerpoDebeSerUnaListaDeNotificaciones() {
+    public void elCuerpoDebeSerUnaLista() {
         response.then().body("$", not(empty()));
     }
+
 }
 

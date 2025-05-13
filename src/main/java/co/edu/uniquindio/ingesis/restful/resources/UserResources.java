@@ -47,6 +47,14 @@ public class UserResources {
         return Response.ok(new MessageDTO<>(false, userResponse)).build();
     }
 
+    @GET
+    @Path("/email/{email}")
+    @PermitAll
+    public Response findByEmail(@PathParam("email") String email) throws ResourceNotFoundException {
+        UserResponse userResponse = userService.findByEmail(email);
+        return Response.ok(new MessageDTO<>(false, userResponse)).build();
+    }
+
     /**
      * Obtener usuarios activos
      */

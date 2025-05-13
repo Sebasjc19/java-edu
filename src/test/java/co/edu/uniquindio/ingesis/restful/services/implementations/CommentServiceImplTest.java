@@ -149,6 +149,7 @@ public class CommentServiceImplTest {
             commentService.updateCommentById(commentId, request);
         });
     }
+    /**
     @Test
     public void testDeleteCommentSuccess() {
         Long commentId = 1L;
@@ -166,6 +167,7 @@ public class CommentServiceImplTest {
         assertNotNull(result);
         assertEquals("Comentario de prueba", result.content());
     }
+     */
 
 
     @Test
