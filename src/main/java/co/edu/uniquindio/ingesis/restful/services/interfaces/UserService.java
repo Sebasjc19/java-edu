@@ -11,6 +11,7 @@ import java.util.List;
 public interface UserService {
     UserResponse createUser(UserRegistrationRequest request);
     UserResponse findById(Long id) throws ResourceNotFoundException;
+    UserResponse findByEmail(String correo) throws ResourceNotFoundException;
     void deleteUser(Long id);
     List<UserResponse> getActiveUsers();
     List<UserResponse> getAllUsers(int page);
