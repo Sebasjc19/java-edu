@@ -82,7 +82,7 @@ public class CommentStepsDefinitions {
         response = given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .auth().oauth2(userSteps.getToken())
+                .auth().oauth2(userSteps.getJwtToken())
                 .body(commentCreationRequest)
                 .when()
                 .post("/comments");
@@ -94,7 +94,7 @@ public class CommentStepsDefinitions {
     public void hagoUnaPeticionGETAlComentarioRecienCreado() {
         response = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getToken())
+                .auth().oauth2(userSteps.getJwtToken())
                 .when()
                 .get("/comments/" + lastCommentId);
     }
@@ -197,7 +197,7 @@ public class CommentStepsDefinitions {
     public void hagoUnaPeticionPUTAComments(String ruta) {
         response = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getToken())
+                .auth().oauth2(userSteps.getJwtToken())
                 .contentType("application/json")
                 .body(updateCommentRequest)
                 .when()
@@ -216,7 +216,7 @@ public class CommentStepsDefinitions {
 
         Response getResponse = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getToken())  // Aquí añades el token
+                .auth().oauth2(userSteps.getJwtToken())  // Aquí añades el token
                 .when()
                 .get("/comments/" + commentId);
 
@@ -228,7 +228,7 @@ public class CommentStepsDefinitions {
     public void hagoUnaPeticionDELETEAComments(int id) {
         response = given()
                 .baseUri("http://localhost:8080")
-                .auth().oauth2(userSteps.getToken())
+                .auth().oauth2(userSteps.getJwtToken())
                 .when()
                 .delete("/comments/" + id);
     }

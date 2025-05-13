@@ -53,7 +53,6 @@ public class UserServiceImpl implements UserService {
         user.setRegistrationDate(LocalDate.now());
         user.setStatus(Status.ACTIVE);
         user.persist();
-
         // Después de guardar, enviar correo de bienvenida
         String asunto = "¡Bienvenido a la plataforma!";
         String mensaje = "Hola " + user.getUsername() + ",\n\n" +
@@ -77,16 +76,6 @@ public class UserServiceImpl implements UserService {
         auditLogger.info("Consulta de usuario por ID: id='{}'", id);
 
         return userMapper.toUserResponse(user);
-    }
-
-    @Override
-    public UserResponse findByEmail(String correo) throws ResourceNotFoundException {
-        Optional<User> user = userRepository.findByEmail(correo);
-        if (user.isPresent()) {
-            auditLogger.info("Consulta de usuario por correo: correo='{}'", correo);
-            return userMapper.toUserResponse(user.get());
-        }
-        throw new ResourceNotFoundException("Usuario no encontrado");
     }
 
     @Override

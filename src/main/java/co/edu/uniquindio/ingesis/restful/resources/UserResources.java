@@ -47,14 +47,6 @@ public class UserResources {
         return Response.ok(new MessageDTO<>(false, userResponse)).build();
     }
 
-    @GET
-    @Path("/email/{email}")
-    @PermitAll
-    public Response findByEmail(@PathParam("email") String email) throws ResourceNotFoundException {
-        UserResponse userResponse = userService.findByEmail(email);
-        return Response.ok(new MessageDTO<>(false, userResponse)).build();
-    }
-
     /**
      * Obtener usuarios activos
      */
@@ -75,7 +67,7 @@ public class UserResources {
 
     @PATCH
     @Path("/{id}")
-    //@RolesAllowed({"STUDENT", "TUTOR"})
+    @RolesAllowed({"STUDENT", "TUTOR"})
     public Response updateUserById(@PathParam("id") Long id, UserUpdateRequest request) {
         UserResponse userResponse = userService.updateUserById(id, request);
         return Response.ok(new MessageDTO<>(false, userResponse)).build();

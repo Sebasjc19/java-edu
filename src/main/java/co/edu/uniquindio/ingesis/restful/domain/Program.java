@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 
@@ -23,7 +22,6 @@ public class Program extends PanacheEntity {
     @NotBlank
     private String description;
     @NotBlank
-    @Length(min = 1, max = 10000)
     private String code;
     private LocalDate creationDate;
     private LocalDate modificationDate;

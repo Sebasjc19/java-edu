@@ -7,32 +7,30 @@ Feature: Gestión de usuarios
     And el cuerpo contiene la información del nuevo usuario
 
   Scenario: Obtener un usuario existente
-    Given existe un usuario con correo "prueba123@mail.com"
-    When envío una solicitud GET del usuario
+    Given existe un usuario con ID 1
+    When envío una solicitud GET a "\/users/1"
     Then recibo un código de estado 200
-    And el cuerpo contiene la información del usuario
+    And el cuerpo contiene la información del usuario con ID 1
 
   Scenario: Actualizar un usuario
-    Given existe un usuario con correo "prueba123@mail.com"
-    And tiene datos a actualizar
-    When envio una solicitud PATCH a /users
+    Given existe un usuario con ID 1 y datos actualizados
+    When envío una solicitud PATCH a "\/users/1"
     Then recibo un código de estado 200
     And el cuerpo contiene la información actualizada
 
   Scenario: Eliminar un usuario
-    Given existe un usuario con correo "prueba321@email.com"
-    When envío una solicitud DELETE a /users
+    Given existe un usuario con ID 1
+    When envío una solicitud DELETE a "\/users/1"
     Then recibo un código de estado 200
-    And el cuerpo contiene el mensaje "Usuario eliminado correctamente"
+    And el cuerpo contiene el mensaje "Usuario eliminado"
 
   Scenario: Obtener todos los usuarios
     Given soy un usuario con rol ADMIN
-    When envio una solicitud GET a /users
+    When envío una solicitud GET a "\/users"
     Then recibo un código de estado 200
     And el cuerpo contiene una lista de usuarios
 
   Scenario: Obtener usuarios activos
-    Given soy un usuario con rol ADMIN
-    When envio una solicitud GET a /users/activos
+    When envío una solicitud GET a "\/users/activos"
     Then recibo un código de estado 200
-    And el cuerpo contiene una lista de usuarios
+    And el cuerpo contiene una lista de usuarios activos

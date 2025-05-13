@@ -80,11 +80,4 @@ public class ProgramResources {
         return Response.ok(programResponse).build();
     }
 
-    @GET
-    @Path("/execute/{id}")
-    @PermitAll
-    public Response ejecutarPrograma(@PathParam("id") String id) throws InterruptedException, IOException {
-        System.out.println("hola");
-        return Response.ok(programService.executeProgram(Long.valueOf(id))).build();
-    }
 }
