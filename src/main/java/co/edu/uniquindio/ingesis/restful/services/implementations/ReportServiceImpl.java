@@ -38,7 +38,7 @@ public class ReportServiceImpl implements ReportService {
     public ReportResponse getReportById(Long id) {
         Report report = Report.findById(id);
         if( report == null ){
-            new ResourceNotFoundException("Reporte no encontrado");
+            throw new ResourceNotFoundException("Reporte no encontrado");
         }
 
         auditLogger.info("Consulta de reporte por ID: id='{}'", id);
@@ -112,18 +112,16 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional
     public ReportResponse deleteReport(Long id) {
-        // Validar si el reporte a eliminar se encuentra en la base de datos
-        Optional<Report> optionalReport = reportRepository.findByIdOptional(id);
-        if (optionalReport.isEmpty()) {
-            new ResourceNotFoundException("Reporte no encontrado");
-        }
+        // Obtener el reporte o lanzar excepción si no existe
+        Report report = reportRepository.findByIdOptional(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Reporte no encontrado"));
 
-        // Obtener el reporte y eliminarlo
-        Report report = optionalReport.get();
+        // Eliminar el reporte
         report.delete();
 
         auditLogger.info("Reporte eliminado: id='{}'", id);
 
         return reportMapper.toReportResponse(report);
     }
+
 }

@@ -15,6 +15,8 @@ import co.edu.uniquindio.ingesis.restful.mappers.GroupMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.GroupRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.GroupService;
+import co.edu.uniquindio.ingesis.restful.utils.ErrorMessages;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.ErrorManager;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -48,7 +51,7 @@ public class GroupServiceImpl implements GroupService {
         }
         Optional<Group> group = groupRepository.findByProfessorId(professorId);
         if (group.isEmpty()) {
-            throw new ResourceNotFoundException("EL grupo no existe");
+            throw new ResourceNotFoundException(ErrorMessages.GROUP_NOT_FOUND);
         }
         Group groupEntity = group.get();
         auditLogger.info("Consulta de grupos por profesor: professorId='{}', total='{}'",
@@ -59,9 +62,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupResponse getGroupById(Long id) {
-        Group group = Group.findById(id);
+        Group group = PanacheEntityBase.findById(id);
         if( group == null ){
-            throw new ResourceNotFoundException("El grupo no existe");
+            throw new ResourceNotFoundException(ErrorMessages.GROUP_NOT_FOUND);
         }
 
         auditLogger.info("Consulta de grupo por ID: groupId='{}'",
@@ -100,7 +103,7 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse updateGroupById(Long id, UpdateGroupRequest request) {
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(id);
         if (optionalGroup.isEmpty()) {
-            throw new ResourceNotFoundException("El grupo no existe");
+            throw new ResourceNotFoundException(ErrorMessages.GROUP_NOT_FOUND);
         }
         User tutor = User.findById(request.idProfessor());
         if (tutor == null) {
@@ -128,7 +131,7 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse deleteGroup(Long id) {
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(id);
         if (optionalGroup.isEmpty()) {
-            throw new ResourceNotFoundException("EL grupo no existe");
+            throw new ResourceNotFoundException(ErrorMessages.GROUP_NOT_FOUND);
         }
 
         Group group = optionalGroup.get();
@@ -161,7 +164,7 @@ public class GroupServiceImpl implements GroupService {
     public void addStudentToGroup(Long groupId, AddStudentToGroupRequest request) {
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(groupId);
         if (optionalGroup.isEmpty()) {
-            throw new ResourceNotFoundException("EL grupo no existe");
+            throw new ResourceNotFoundException(ErrorMessages.GROUP_NOT_FOUND);
         }
         User studentUser = User.findById(request.studentId());
         if (studentUser == null) {
@@ -177,7 +180,7 @@ public class GroupServiceImpl implements GroupService {
     public void removeStudentFromGroup(Long groupId, Long studentId) {
         Optional<Group> optionalGroup = groupRepository.findByIdOptional(groupId);
         if (optionalGroup.isEmpty()) {
-            throw new ResourceNotFoundException("EL grupo no existe");
+            throw new ResourceNotFoundException(ErrorMessages.GROUP_NOT_FOUND);
         }
         User studentUser = User.findById(studentId);
         if (studentUser == null) {

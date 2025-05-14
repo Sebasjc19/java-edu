@@ -12,6 +12,7 @@ import co.edu.uniquindio.ingesis.restful.exceptions.users.implementations.Userna
 import co.edu.uniquindio.ingesis.restful.mappers.UserMapper;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.UserService;
+import co.edu.uniquindio.ingesis.restful.utils.ErrorMessages;
 import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -70,7 +71,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse findById(Long id) throws ResourceNotFoundException {
         User user = User.findById(id);
         if (user == null) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
+            throw new ResourceNotFoundException(ErrorMessages.USER_NOT_FOUND);
         }
 
         auditLogger.info("Consulta de usuario por ID: id='{}'", id);
@@ -118,7 +119,7 @@ public class UserServiceImpl implements UserService {
         // Validar si el usuario se encuentra en la base de datos
         Optional<User> optionalUser = userRepository.findByIdOptional(id);
         if (optionalUser.isEmpty()) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
+            throw new ResourceNotFoundException(ErrorMessages.USER_NOT_FOUND);
         }
 
         /*
@@ -149,7 +150,7 @@ public class UserServiceImpl implements UserService {
         // Validar si el usuario se encuentra en la base de datos
         Optional<User> optionalUser = userRepository.findByIdOptional(id);
         if (optionalUser.isEmpty()) {
-            throw new ResourceNotFoundException("Usuario no encontradi");
+            throw new ResourceNotFoundException(ErrorMessages.USER_NOT_FOUND);
         }
 
         auditLogger.info("Usuario desactivado (borrado lógico): id='{}'", id);
@@ -168,6 +169,6 @@ public class UserServiceImpl implements UserService {
             auditLogger.info("Consulta de usuario por correo: correo='{}'", correo);
             return userMapper.toUserResponse(user.get());
         }
-        throw new ResourceNotFoundException("Usuario no encontrado");
+        throw new ResourceNotFoundException(ErrorMessages.USER_NOT_FOUND);
     }
 }
