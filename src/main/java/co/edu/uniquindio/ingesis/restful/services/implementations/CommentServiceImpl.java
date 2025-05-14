@@ -12,6 +12,8 @@ import co.edu.uniquindio.ingesis.restful.repositories.interfaces.CommentReposito
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.ProgramRepository;
 import co.edu.uniquindio.ingesis.restful.repositories.interfaces.UserRepository;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.CommentService;
+import co.edu.uniquindio.ingesis.restful.utils.ErrorMessages;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -42,7 +44,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponse> getAllComments(int page) {
         // Se obtienen todos los comentarios  de la base de datos, sin importar su estado lógico
-        List<Comment> comments = Comment.findAll().page(Page.of(page,10)).list();
+        List<Comment> comments = PanacheEntity.findAll().page(Page.of(page, 10)).list();
 
         auditLogger.info("consulta todos los comentarios, página '{}', total='{}'",
                  page, comments.size());
@@ -57,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse getCommentById(Long id) {
         Optional<Comment>optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()){
-            throw new ResourceNotFoundException("Comentario no encontrado");        }
+            throw new ResourceNotFoundException(ErrorMessages.COMMENT_NOT_FOUND);        }
         Comment comment = optionalComment.get();
         if(comment.getProfessorId() == null){
             throw new ResourceNotFoundException("Profesor no encontrado");}
@@ -95,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
         // Validar si el comentario se encuentra en la base de datos
         Optional<Comment> optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()) {
-            throw new ResourceNotFoundException("Comentario no encontrado");
+            throw new ResourceNotFoundException(ErrorMessages.COMMENT_NOT_FOUND);
         }
 
         Comment comment = optionalComment.get();
@@ -113,7 +115,7 @@ public class CommentServiceImpl implements CommentService {
         // Validar si el comentario se encuentra en la base de datos
         Optional<Comment> optionalComment = commentRepository.findByIdOptional(id);
         if (optionalComment.isEmpty()) {
-            throw new ResourceNotFoundException("Comentario no encontrado");
+            throw new ResourceNotFoundException(ErrorMessages.COMMENT_NOT_FOUND);
         }
 
         // Obtener el comentario y eliminarlo

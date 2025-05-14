@@ -67,8 +67,8 @@ public class TokenUtils {
     private static String removeBeginEnd(String pem) {
         pem = pem.replaceAll("-----BEGIN (.*)-----", "");
         pem = pem.replaceAll("-----END (.*)----", "");
-        pem = pem.replaceAll("\r\n", "");
-        pem = pem.replaceAll("\n", "");
+        pem = pem.replace("\r\n", "");
+        pem = pem.replace("\n", "");
         return pem.trim();
     }
 
