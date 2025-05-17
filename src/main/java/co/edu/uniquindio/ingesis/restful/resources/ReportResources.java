@@ -3,6 +3,10 @@ package co.edu.uniquindio.ingesis.restful.resources;
 import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportCreationRequest;
 import co.edu.uniquindio.ingesis.restful.dtos.reports.ReportResponse;
 import co.edu.uniquindio.ingesis.restful.services.interfaces.ReportService;
+import io.quarkus.qute.CheckedTemplate;
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -23,6 +27,47 @@ public class ReportResources {
 
     @Inject
     ReportService reportService;
+    @Inject
+    @Location("ReportResources/reportList.html")
+    Template reportList; // inyecta templates/reports/reportList.html
+
+    @Inject
+    @Location("ReportResources/singleReport.html")
+    Template singleReport;
+
+
+    @GET
+    @Path("/report_view/{id}")
+    @Produces(MediaType.TEXT_HTML)
+    @RolesAllowed({"TUTOR", "ADMIN"})
+    public String getReportByIdHtml(@PathParam("id") Long id) {
+        ReportResponse report;
+        try {
+            report = reportService.getReportById(id);
+        } catch (NotFoundException e) {
+            report = null;
+        }
+        return singleReport
+                .data("report", report)
+                .data("reportId", id)
+                .render();
+    }
+
+
+    @GET
+    @Path("/profesor/{id}")
+    @RolesAllowed({"TUTOR", "ADMIN"})
+    @Produces(MediaType.TEXT_HTML)
+    public String listReportsHtml(@PathParam("id") Long id) {
+        List<ReportResponse> reports = reportService.findReportsByProfessorId(id);
+        return reportList
+                .data("reports", reports)
+                .data("title", "Reportes del Profesor ID " + id)
+                .render();
+    }
+
+
+
 
     @GET
     @Path("/{id}")
