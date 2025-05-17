@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte ID: {reportId}</title> <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9; }
+        h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .report-details div { margin-bottom: 12px; }
+        .label { font-weight: bold; color: #555; }
+        pre { background-color: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+<div class="container">
+    {#if report}
+        <h1>Detalle del Reporte (ID: {reportId})</h1>
+        <div class="report-details">
+            <div><span class="label">Fecha de Creación:</span> {report.creationDate.format('dd/MM/yyyy')}</div>
+            <div><span class="label">Profesor ID:</span> {report.professorId}</div>
+            <div><span class="label">Grupo ID:</span> {report.groupId}</div>
+            <div>
+                <span class="label">Contenido:</span>
+                <pre>{report.content}</pre>
+            </div>
+        </div>
+    {#else}
+        <h1>Reporte no Encontrado</h1>
+        <p>El reporte solicitado con ID {reportId} no pudo ser encontrado.</p>
+    {/if}
+</div>
+</body>
+</html>
