@@ -62,7 +62,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupResponse getGroupById(Long id) {
-        Group group = PanacheEntityBase.findById(id);
+        Group group = groupRepository.findById(id);
         if( group == null ){
             throw new ResourceNotFoundException(ErrorMessages.GROUP_NOT_FOUND);
         }

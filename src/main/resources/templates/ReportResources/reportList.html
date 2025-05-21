@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>{title ?: 'Lista de Reportes'}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
@@ -18,35 +18,39 @@
 <body>
 <div class="container">
     <h1>{title ?: 'Lista de Reportes'}</h1>
+    <a href="/reports/report_list_pdf/{id}" target="_blank"
+       style="display:inline-block; margin-top:15px; margin-bottom:10px; padding:10px 15px; background:#28a745; color:white; border-radius:5px; text-decoration:none;">
+        Descargar todos los reportes en PDF
+    </a>
 
     {#if reports.size > 0}
-    <table>
-        <thead>
-        <tr>
-            <th>Fecha de Creación</th>
-            <th>Profesor ID</th>
-            <th>Grupo ID</th>
-            <th>Contenido (Extracto)</th>
-        </tr>
-        </thead>
-        <tbody>
-        {#for report in reports}
+        <table>
+            <thead>
             <tr>
-                <td>{#if report.creationDate}{report.creationDate.format('dd/MM/yyyy')}{#else}N/A{/if}</td>
-                <td>{#if report.professorId}{report.professorId}{#else}N/A{/if}</td>
-                <td>{#if report.groupId}{report.groupId}{#else}N/A{/if}</td>
-                <td>
-                    {#if report.content}
-                        <div class="content-extract" title="{report.content}">{report.content}</div>
-                    {#else}
-                        N/A
-                    {/if}
-                </td>
+                <th>Fecha de Creación</th>
+                <th>Profesor ID</th>
+                <th>Grupo ID</th>
+                <th>Contenido (Extracto)</th>
             </tr>
-        {/for}
-        </tbody>
-    </table>
-    <p class="no-reports">No se encontraron reportes que coincidan con los criterios.</p>
+            </thead>
+            <tbody>
+            {#for report in reports}
+                <tr>
+                    <td>{#if report.creationDate}{report.creationDate.format('dd/MM/yyyy')}{#else}N/A{/if}</td>
+                    <td>{#if report.professorId}{report.professorId}{#else}N/A{/if}</td>
+                    <td>{#if report.groupId}{report.groupId}{#else}N/A{/if}</td>
+                    <td>
+                        {#if report.content}
+                            <div class="content-extract" title="{report.content}">{report.content}</div>
+                        {#else}
+                            N/A
+                        {/if}
+                    </td>
+                </tr>
+            {/for}
+            </tbody>
+        </table>
+        <p class="no-reports">No se encontraron reportes que coincidan con los criterios.</p>
     {/if}
 </div>
 </body>

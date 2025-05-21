@@ -24,7 +24,7 @@ public class CommentResources {
     //CRUD
     // 1. Obtener todos los comentarios
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"STUDENT", "TUTOR", "ADMIN"})
     public Response getAllComments(@QueryParam("page")@DefaultValue("0") int page) {
         List<CommentResponse> commentResponse = commentService.getAllComments(page);
         return Response.ok(commentResponse).build();
@@ -42,7 +42,7 @@ public class CommentResources {
 
     // 3. Crear un nuevo comentario
     @POST
-    @RolesAllowed({"TUTOR"})
+    @RolesAllowed({"STUDENT", "TUTOR"})
     public Response createComment(@Valid CommentCreationRequest request) {
         CommentResponse commentResponse = commentService.createComment(request);
         return Response.ok(commentResponse).build();
@@ -68,7 +68,7 @@ public class CommentResources {
 
     // 7. Método personalizado: Obtener comentarios realizados segun el profesor
     @GET
-    @RolesAllowed({"STUDENT"})
+    @RolesAllowed({"STUDENT", "TUTOR"})
     @Path("/{professorId}")
     public Response findCommentsByProfessorId(@PathParam("professorId") Long professorId,@QueryParam("page")@DefaultValue("0") int page) {
         //TODO: pendiente de organizar la ruta

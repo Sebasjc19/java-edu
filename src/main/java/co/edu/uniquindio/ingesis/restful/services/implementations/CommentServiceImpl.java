@@ -44,7 +44,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponse> getAllComments(int page) {
         // Se obtienen todos los comentarios  de la base de datos, sin importar su estado lógico
-        List<Comment> comments = PanacheEntity.findAll().page(Page.of(page, 10)).list();
+        List<Comment> comments = commentRepository.findAll().page(Page.of(page, 10)).list();
 
         auditLogger.info("consulta todos los comentarios, página '{}', total='{}'",
                  page, comments.size());

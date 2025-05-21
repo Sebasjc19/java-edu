@@ -1,20 +1,35 @@
 <!DOCTYPE html>
-<html lang="es">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Reporte ID: {reportId}</title> <style>
+    <meta charset="UTF-8" />
+    <title>Reporte ID: {reportId}</title>
+    <style>
         body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
         .container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9; }
         h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         .report-details div { margin-bottom: 12px; }
         .label { font-weight: bold; color: #555; }
         pre { background-color: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; }
+        .btn-download {
+            display: inline-block;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     {#if report}
         <h1>Detalle del Reporte (ID: {reportId})</h1>
+        <a href="/reports/report_single_pdf/{reportId}" target="_blank" class="btn-download">
+            Descargar Reporte en PDF
+        </a>
         <div class="report-details">
             <div><span class="label">Fecha de Creación:</span> {report.creationDate.format('dd/MM/yyyy')}</div>
             <div><span class="label">Profesor ID:</span> {report.professorId}</div>
