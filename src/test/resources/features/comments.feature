@@ -1,15 +1,15 @@
 Feature: Gestión de Comentarios
 
   Scenario: Obtener un comentario por ID
-    Given existe un usuario con rol "STUDENT" autenticado
+    Given existe un usuario para commentario con rol "TUTOR" autenticado
     And creo un comentario valido
     When hago una petición GET al comentario recién creado
     Then la respuesta debe tener código de estado 200
-    And el cuerpo debe contener el ID del comentario
+    And el cuerpo debe contener el content del comentario "Excelente contenido"
 
   Scenario: Obtener todos los comentarios de un usuario
-    Given existe un usuario con comments asignados
-    When consulto los comments del usuario autenticado
+    Given existe un usuario para commentario con rol "TUTOR" autenticado
+    When consulto los comentarios del usuario autenticado
     Then la respuesta debe tener código de estado 200
     And el cuerpo debe ser una lista de comentarios
 
@@ -21,7 +21,7 @@ Feature: Gestión de Comentarios
 
   Scenario: Actualizar un comentario existente
     Given Existe un comentario y datos nuevos validos
-    When hago una petición PUT a "/comments/1"
+    When hago una peticion PUT, hacia la ruta "/comments/"
     Then la respuesta debe tener código de estado 200
     And el cuerpo debe reflejar los datos actualizados
 

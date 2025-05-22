@@ -8,10 +8,14 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.And;
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import lombok.Getter;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
@@ -27,51 +31,54 @@ public class CommentStepsDefinitions {
     private Long lastCommentId;
     String tutorToken;
     Long tutorId;
-    
 
-    @Given("Tengo los datos validos para crear un comentario")
-    public void tengoLosDatosValidosParaCrearUnComentario() {
-        commentCreationRequest = new CommentCreationRequest(
-                "Excelente contenido",LocalDate.of(2000, 5, 20),
-                1L,
-                1L
-        );
+
+    @Given("existe un usuario para commentario con rol {string} autenticado")
+    public void elUsuarioConIdTieneComentariosAsignados(String rolUsuario) {
+        Role rol = Role.valueOf(rolUsuario.toUpperCase());
+        userSteps.crearYLoggearUsuarioConRol(rol);
     }
-
-    @When("hago una petición Post a comments")
-    public void hagoUnaPeticionPOSTAComments() {
+    @When("consulto los comentarios del usuario autenticado")
+    public void hagoUnaPeticionGETACommentsConRol() {
         response = given()
                 .baseUri("http://localhost:8080")
                 .contentType("application/json")
-                .body(commentCreationRequest)
+                .auth().oauth2(tutorToken)
                 .when()
-                .post("/comments");
-
-        commentId = response.jsonPath().getLong("id");
-        System.out.println("ID del usuario creado: " + commentId);
-
+                .get("/comments/" + tutorId);
     }
 
-    @Then("la respuesta debe tener código de estado: {int}")
-    public void laRespuestaDebeTenerCodigoDeEstado(int statusCode) {
-        response.then().statusCode(statusCode);
+    @And("el cuerpo debe ser una lista de comentarios")
+    public void elCuerpoDebeSerUnaLista() {
+        response.then().body("$", not(empty()));
     }
 
-    @And("el cuerpo debe contener el texto del comentario {string}")
-    public void elCuerpoDebeContenerElTextoDelComentario(String textoEsperado) {
-        response.then().body("content", equalToIgnoringCase(textoEsperado));
-    }
 
-    // ----------------------------
-
-//    @Given("existe un usuario con rol {string} autenticado")
-//    public void existeUnUsuarioConRolAutenticado(String rolUsuario) {
-//        Role rol = Role.valueOf(rolUsuario.toUpperCase());
-//        userSteps.crearYLoggearUsuarioConRol(rol);
-//    }
 
     @And("creo un comentario valido")
     public void creoUnComentarioValido() {
+        Long userID = userSteps.getUserId();
+        Response checkResponse = given()
+                .baseUri("http://localhost:8080")
+                .contentType("application/json")
+                .auth().oauth2(userSteps.getToken())
+                .when()
+                .get("/comments/" + userID);
+        if (checkResponse.statusCode() == 200) {
+            // Se asume que la respuesta es una lista de objetos con campos "id"
+            List<Map<String, Object>> comentarios = checkResponse.jsonPath().getList("");
+            if (!comentarios.isEmpty()) {
+                Integer id = (Integer) comentarios.get(0).get("id");
+                lastCommentId = id.longValue();
+                System.out.println("Ya existe un comentario con ID: " + lastCommentId);
+                return;
+            }
+        } else if (checkResponse.statusCode() == 404) {
+            System.out.println("No hay commentarios existentes para el usuario " + userID + ". Se procederá a crear uno.");
+        } else {
+            throw new RuntimeException("Error inesperado al consultar comentarios: " + checkResponse.statusCode());
+        }
+
         commentCreationRequest = new CommentCreationRequest(
                 "Muy bien explicado",
                 LocalDate.now(),
@@ -90,6 +97,7 @@ public class CommentStepsDefinitions {
         lastCommentId = response.jsonPath().getLong("id");
     }
 
+
     @When("hago una petición GET al comentario recién creado")
     public void hagoUnaPeticionGETAlComentarioRecienCreado() {
         response = given()
@@ -99,101 +107,57 @@ public class CommentStepsDefinitions {
                 .get("/comments/" + lastCommentId);
     }
 
-    @And("el cuerpo debe contener el ID del comentario")
-    public void elCuerpoDebeContenerElIDDelComentario() {
-        response.then().body("id", notNullValue());
+    @And("el cuerpo debe contener el texto del comentario {string}")
+    public void elCuerpoDebeContenerElTextoDelComentario(String textoEsperado) {
+        response.then().body("content", equalToIgnoringCase(textoEsperado));
+    }
+    
+
+    @Given("Tengo los datos validos para crear un comentario")
+    public void tengoLosDatosValidosParaCrearUnComentario() {
+        commentCreationRequest = new CommentCreationRequest(
+                "Excelente contenido",LocalDate.of(2000, 5, 20),
+                4L,
+                1L
+        );
     }
 
-    @Given("existe un usuario con comments asignados")
-    public void elUsuarioConIdTieneComentariosAsignados() {
-        // Se crea el tutor
-        UserRegistrationRequest nuevoTutor = new UserRegistrationRequest(
-                "tutor_mario_castañeda",
-                "tutor@example.com",
-                "Salem2004",
-                "1234567890",
-                LocalDate.of(2000, 5, 20),
-                                Role.TUTOR
-        );
-
-        Response crearUsuarioResponse = given()
-                .baseUri("http://localhost:8080")
-                .contentType("application/json")
-                .body(nuevoTutor)
-                .when()
-                .post("/users");
-
-        crearUsuarioResponse.then().statusCode(201);
-
-        tutorId = crearUsuarioResponse.jsonPath().getLong("id");
-
-        // Se autentica y obtiene el token
-        LoginRequest loginRequest = new LoginRequest(
-                nuevoTutor.email(),
-                "Salem2004" // misma que usaste en el registro
-        );
-
-        // Hacer la solicitud POST al endpoint de login
-        Response loginResponse = given()
-                .baseUri("http://localhost:8080")
+    @When("hago una petición Post a comments")
+    public void hagoUnaPeticionPOSTAComments() {
+        response = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body(loginRequest) // Enviar el loginRequest en el cuerpo de la solicitud
+                .body(commentCreationRequest)
                 .when()
-                .post("/auth"); // Ruta del endpoint de autenticación
+                .post("/comments");
 
-        // Se extrae el token de la respuesta
-        tutorToken = loginResponse.then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getString("respuesta.token"); // Ajusta el path al nombre correcto del token
+        commentId = response.jsonPath().getLong("id");
+        System.out.println("ID del comentario creado: " + commentId);
 
-        // Se crea un programa asociado a dicho tutor
-        CommentCreationRequest newComment = new CommentCreationRequest(
-                "Buen contenido",
-                LocalDate.of(2000,5,20),
-                tutorId,
-                1l
-        );
-
-        Response crearProgramaResponse = given()
-                .baseUri("http://localhost:8080")
-                .contentType("application/json")
-                .auth().oauth2(tutorToken)
-                .body(newComment)
-                .when()
-                .post("/programs");
-
-        crearProgramaResponse.then().statusCode(201);
     }
 
-    @When("consulto los comments del usuario autenticado")
-    public void hagoUnaPeticionGETACommentsConRol() {
-        response = given()
-                .baseUri("http://localhost:8080")
-                .contentType("application/json")
-                .auth().oauth2(tutorToken)
-                .when()
-                .get("/comments/" + tutorId);
+    @Then("la respuesta debe tener código de estado {int}")
+    public void laRespuestaDebeTenerCodigoDeEstado(int statusCode) {
+        response.then().statusCode(statusCode);
     }
 
-    @And("el cuerpo debe ser una lista de comentarios")
-    public void elCuerpoDebeSerUnaLista() {
-        response.then().body("$", not(empty()));
+    @And("el cuerpo debe contener el content del comentario {string}")
+    public void elCuerpoDebeContenerElIDDelComentario() {
+        response.then().body("content", notNullValue());
     }
 
+
+    // ----------------------------
     @Given("Existe un comentario y datos nuevos validos")
-    public void existeUnComentarioConIdYDatosNuevosValidos(int id) {
-        elUsuarioConIdTieneComentariosAsignados(); // Se reutiliza para crear el usuario y el programa asignado a este
-
+    public void existeUnComentarioConIdYDatosNuevosValidos() {
+        elUsuarioConIdTieneComentariosAsignados("TUTOR");
+        creoUnComentarioValido();// Se reutiliza para crear el usuario y el programa asignado a este
         // Datos nuevos para actualizar
         updateCommentRequest = new UpdateCommentRequest(
-                "Actualizacao de comment"
+                "Actualizao de comment"
         );
     }
 
-    @When("hago una petición PUT a {string}")
+    @When("hago una peticion PUT, hacia la ruta {string}")
     public void hagoUnaPeticionPUTAComments(String ruta) {
         response = given()
                 .baseUri("http://localhost:8080")
@@ -201,7 +165,7 @@ public class CommentStepsDefinitions {
                 .contentType("application/json")
                 .body(updateCommentRequest)
                 .when()
-                .put(ruta);
+                .put(ruta + lastCommentId);
     }
 
     @And("el cuerpo debe reflejar los datos actualizados")
@@ -209,10 +173,9 @@ public class CommentStepsDefinitions {
         response.then().body("content", equalToIgnoringCase(commentCreationRequest.content()));
     }
 
-
     @Given("Existe un comentario con ID {int}")
     public void existeUnProgramaConID(int commentId) {
-        commonSteps.existeUnUsuarioConRolAutenticado("TUTOR");
+        elUsuarioConIdTieneComentariosAsignados("TUTOR");
 
         Response getResponse = given()
                 .baseUri("http://localhost:8080")
@@ -230,7 +193,7 @@ public class CommentStepsDefinitions {
                 .baseUri("http://localhost:8080")
                 .auth().oauth2(userSteps.getToken())
                 .when()
-                .delete("/comments/" + id);
+                .delete("/comments/" + lastCommentId);
     }
 
 }

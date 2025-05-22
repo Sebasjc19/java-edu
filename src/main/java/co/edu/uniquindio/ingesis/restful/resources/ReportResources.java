@@ -15,9 +15,12 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Path("/reports")
 @Produces(MediaType.APPLICATION_JSON)
@@ -36,10 +39,66 @@ public class ReportResources {
     Template singleReport;
 
 
+
+    @GET
+    @Path("/report_list_pdf/{profesorId}")
+    @Produces("application/pdf")
+    @PermitAll
+    public Response exportReportListToPdf(@PathParam("profesorId") Long profesorId) {
+        List<ReportResponse> reports = reportService.findReportsByProfessorId(profesorId);
+
+        String htmlContent = reportList
+                .data("reports", reports)
+                .data("title", "Reportes del Profesor ID " + profesorId)
+                .data("id",profesorId)
+                .render();
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(htmlContent);
+            renderer.layout();
+            renderer.createPDF(baos);
+
+            return Response.ok(baos.toByteArray(), "application/pdf")
+                    .header("Content-Disposition", "attachment; filename=Lista_Reportes_" + profesorId + ".pdf")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace(); // o log.error(...)
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al generar PDF de lista").build();
+        }
+    }
+    @GET
+    @Path("/report_single_pdf/{id}")
+    @Produces("application/pdf")
+    @PermitAll
+    public Response exportSingleToPdf(@PathParam("id") Long id) {
+        ReportResponse reportResponse  =reportService.getReportById(id);
+
+        String htmlContent = singleReport
+                .data("report", reportResponse)
+                .data("title", "Reporte del ID " + id)
+                .data("reportId", id)
+                .render();
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(htmlContent);
+            renderer.layout();
+            renderer.createPDF(baos);
+
+            return Response.ok(baos.toByteArray(), "application/pdf")
+                    .header("Content-Disposition", "attachment; filename=single_Report" + id + ".pdf")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace(); // o log.error(...)
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al generar PDF de lista").build();
+        }
+    }
+
     @GET
     @Path("/report_view/{id}")
     @Produces(MediaType.TEXT_HTML)
-    @RolesAllowed({"TUTOR", "ADMIN"})
+    @PermitAll
     public String getReportByIdHtml(@PathParam("id") Long id) {
         ReportResponse report;
         try {
@@ -50,19 +109,21 @@ public class ReportResources {
         return singleReport
                 .data("report", report)
                 .data("reportId", id)
+                .data("id",id)
                 .render();
     }
 
 
     @GET
     @Path("/profesor/{id}")
-    @RolesAllowed({"TUTOR", "ADMIN"})
+    @PermitAll
     @Produces(MediaType.TEXT_HTML)
     public String listReportsHtml(@PathParam("id") Long id) {
         List<ReportResponse> reports = reportService.findReportsByProfessorId(id);
         return reportList
                 .data("reports", reports)
                 .data("title", "Reportes del Profesor ID " + id)
+                .data("id",id)
                 .render();
     }
 
